@@ -35,7 +35,7 @@ The reference, VCO and divider circuits use separate supply/ground pairs (`vdd_r
 | --- | --- | --- | --- | --- | --- | --- |
 | VCO Frequency Range | 86 | 96 | 106 | MHz |  |  |
 | Supply Voltage | 1.62 | 1.8 | 1.98 | V |  |  |
-| Input frequency range | 4 |  | 16 |  | 4,6,8,12,16 MHz int-N supported |  |
+| Input frequency range | 4 |  | 16 | MHz |  |  |
 | Operating Temperature | -40 | 25 | 85 | °C |  |  |
 | Power Consumption |  | 378 |  | uW | From 1.8 V | 210 uA. Pre-layout sim (tt, 27 °C, C-extracted lvdig cells): 277-312 uW (154-174 uA) for 4-16 MHz input |
 | Lock time |  |  | 60 | T_ref | 15 us at 4 MHz, 3.75 us at 16 MHz (60 x R x T_ref if divr divides) |  |
@@ -72,12 +72,22 @@ The reference, VCO and divider circuits use separate supply/ground pairs (`vdd_r
 | clk_out | o | clock output at vco frequency (96 MHz) |
 | clk_out_div2 | o | clock output at half vco frequency (48 MHz) |
 
+## Harness Resources
 
-# Absolute Maximum Ratings
+Connections on the Chipalooza harness chip, within the resources each project may assume:
 
-| Parameter | Min | Max | Unit | Notes |
-| --- | --- | --- | --- | --- |
-| Supply voltage (vdd_ref, vdd_vco, vdd_div) | 1.62 | 1.98 | V | 1.8 V +/-10%, each relative to its own ground |
+| Resource | Allowed | Used | Connects to |
+| --- | --- | --- | --- |
+| 1.8-V digital supply and ground | yes | 1 supply, ground | `vdd_div` (feedback divider and clock outputs); `gnd_ref`, `gnd_vco`, `gnd_div` |
+| 3.3-V analog supply | yes | 0 | not used |
+| Bandgap-referenced bias voltage | 1 | 0 | not used |
+| Bandgap-referenced current sources | 2 | 1 | `ibnp_1u`: 1 uA, sunk by the harness source (NMOS output) from the PMOS diode in the charge pump |
+| Digital controls (inputs) | 24 | 20 | `clk`, `divr_en`, `divr_r[1:0]`, `chp_en`, `chp_b[2:0]`, `lpf_csc`, `lpf_rsc[1:0]`, `vco_tst[2:0]`, `divf_c[4:0]`, and `clk_sel` for the output multiplexer |
+| Digital test signals (outputs) | 12 | 0 | not used |
+| Shared analog lines | 4 | 0 | not used |
+| Dedicated pins | 3 | 3 | 1.8-V supply pad for `vdd_ref`; 1.8-V supply pad for `vdd_vco`; one digital I/O pad for `clk_out` or `clk_out_div2`, chosen by a multiplexer |
+
+`vdd_ref` and `vdd_vco` get their own supply pads so the reference and VCO currents can be measured separately and the VCO supply is isolated from the harness logic supply. A 2:1 multiplexer in the `vdd_div` domain sends either `clk_out` (96 MHz, `clk_sel` = 0) or `clk_out_div2` (48 MHz, `clk_sel` = 1) to the dedicated digital I/O pad. The pad's 1.8-V core-side input takes the multiplexer output and the pad shifts it to the 3.3-V I/O level.
 
 
 # Test Ports
@@ -123,14 +133,6 @@ With the loop open, stepping `vc` through these levels and measuring `clk_out` g
 
 # Test Plan
 
-## Equipment needed
-Will request access to test resources at UCSD for measurements
-* Programmable power supplies for 1.8-V core, 3.3-V IO
-* Signal generator for input reference clock
-* Spectrum analyzer or phase noise analyzer
-* Oscilloscope
-* DMM
-
 ## Conditions
 * Full voltage range at room temp (may not have access to temp chamber)
 
@@ -140,6 +142,7 @@ Will request access to test resources at UCSD for measurements
 * Power consumption
 * Jitter, Phase Noise
 * Reference spur, other spurious
+* VCO tuning
 
 
 # Reproducing the Results

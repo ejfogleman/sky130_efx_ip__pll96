@@ -23,6 +23,9 @@ untitled*
 # Loop-filter working files (notebook, PDF and its markdown rendering), not published
 doc/pll-filter/
 
+# Chipalooza items sent separately from the proposal (equipment, CVs), not published
+doc/submission/
+
 # Simulation directory
 sim/*.txt
 # Testbench netlists in sim/ are tracked; *.raw and *.log above stay ignored
