@@ -1,5 +1,4 @@
-v {xschem version=3.4.5 file_version=1.2
-}
+v {xschem version=3.4.7 file_version=1.2}
 G {}
 K {}
 V {}
@@ -927,12 +926,12 @@ C {lab_pin.sym} 410 -1150 1 0 {name=p9 sig_type=std_logic lab=b_b[1]
 }
 C {lab_pin.sym} 510 -1150 1 0 {name=p24 sig_type=std_logic lab=b_bb[0]}
 C {lab_pin.sym} 590 -1150 1 0 {name=p43 sig_type=std_logic lab=b_b[0]}
-C {ejf_pll96_dbuf.sym} 1070 -1200 0 0 {name=x1}
+C {efx_pll96_dbuf.sym} 1070 -1200 0 0 {name=x1}
 C {lab_pin.sym} 1220 -1230 0 1 {name=p10 sig_type=std_logic lab=vdd}
 C {lab_pin.sym} 1220 -1170 0 1 {name=p57 sig_type=std_logic lab=gnd}
 C {lab_pin.sym} 1220 -1210 0 1 {name=p58 sig_type=std_logic lab=en_bb}
 C {lab_pin.sym} 1220 -1190 0 1 {name=p59 sig_type=std_logic lab=en_b}
-C {ejf_pll96_dbuf.sym} 1510 -1200 0 0 {name=x3[2:0]}
+C {efx_pll96_dbuf.sym} 1510 -1200 0 0 {name=x3[2:0]}
 C {lab_pin.sym} 1660 -1230 0 1 {name=p64 sig_type=std_logic lab=vdd}
 C {lab_pin.sym} 1660 -1170 0 1 {name=p65 sig_type=std_logic lab=gnd}
 C {lab_pin.sym} 1660 -1210 0 1 {name=p66 sig_type=std_logic lab=b_bb[2:0]}

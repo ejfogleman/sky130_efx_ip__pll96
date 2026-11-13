@@ -1,0 +1,258 @@
+** sch_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/tb_efx_pll96_sdiv_mm_reg.sch
+
+* Copyright (c) Eric Fogleman 2026
+* SPDX-License-Identifier: Apache-2.0
+
+**.subckt tb_efx_pll96_sdiv_mm_reg
+V1 clk GND 0 PULSE(0 {VDD} {TD_VCO} {T_RF} {T_RF} {T_VCO/2} {T_VCO})
+V_VDD_DIV vdd_div GND {VDD}
+.save i(v_vdd_div)
+V2 s3 GND {VS3}
+V5 s2 GND {VS2}
+V8 s1 GND {VS1}
+V11 s0 GND {VS0}
+V14 p3 GND {VP3}
+V17 p2 GND {VP2}
+V20 p1 GND {VP1}
+V23 p0 GND {VP0}
+V26 en3 GND {VEN3}
+V29 en2 GND {VEN2}
+V32 en1 GND {VEN1}
+V35 en0 GND {VEN0}
+V4 ens GND {VENS}
+V10 divr_en GND {VDIVR_EN}
+V16 r1 GND {VR1}
+V22 r0 GND {VR0}
+xdivmm p3 clk p2 p1 clk_divf p0 en3 en2 en1 s3 s2 s1 s0 vdd_div GND en0 ens efx_pll96_sdiv_mm
+C3 clk_divf 0 {CLOAD} m=1
+xdivr divr_en clk_out clk_divr r1 vdd_ref GND r0 efx_pll96_div_r
+C1 clk_divr 0 {CLOAD} m=1
+V_VDD_REF vdd_ref GND {VDD}
+.save i(v_vdd_ref)
+V56 clk_out GND 0 PULSE(0 {VDD} {TD_REF} {T_RF} {T_RF} {T_REF/2} {T_REF})
+**** begin user architecture code
+
+* ejf_pfd test
+.lib ~/.ciel/sky130A/libs.tech/combined/sky130.lib.spice tt
+
+*** efx_pll96_div regression
+*** run with:
+*** ngspice -b -r mm_reg.raw -o mm_reg.out tb_efx_pll96_sdiv_mm_reg.spice
+
+*** simulation setup
+.option temp=27
+.param VDD=1.8
+.param TD_REF=50n
+.param TD_VCO=2.5n
+.param T_RF=300p
+.param T_RAMP=50n
+.param CP=10f
+.param CLOAD=10f
+.param IB=1u
+.param VDIVR_EN=1.8
+.param VCHP_EN=1.8
+.param VTST0=0
+.param VTST1=0
+.param VTST2=0
+
+*** mode-dependent options
+.include config.inc
+
+
+
+* lvdig standard cells (layout-extracted, C parasitics; symbols are primitives)
+.include /home/ejf/Projects/sky130_efx_ip__pll96/dependencies/sky130_efx_ip__lvdig/spice/sky130_efx_lvdig_c.spice
+
+
+* Run transient
+* default reltol=1e-3 vntol=1e-6 abstol=1e-12
+.options  reltol=1e-4 vntol=1e-7 abstol=1e-13
+*.options klu
+.control
+   save i(v_vdd_ref) i(v_vdd_div)
+   save clk clk_out clk_divr clk_divf
+   save xdivmm.clk_div23 xdivmm.mc
+   save xdivmm.xp.q3 xdivmm.xp.q2 xdivmm.xp.q1 xdivmm.xp.q0 xdivmm.xp.q3_or_dis xdivmm.xp.q2_or_dis xdivmm.xp.q1_or_dis xdivmm.xp.q0_or_dis
+   save xdivmm.q
+   save xdivmm.xn.q1 xdivmm.xn.d2
+   tran 1n 2u
+   write tb_efx_pll96_sdiv_mm_reg.raw
+   meas tran idd_ref avg i(v_vdd_ref) from=800n to=2u
+   meas tran idd_div avg i(v_vdd_div) from=800n to=2u
+   meas tran T_CLK_DIVF trig v(clk_divf) val=0.9 rise=1 td=800n targ v(clk_divf) val=0.9 rise=2 td=800n
+   print 1/T_CLK_DIVF
+   meas tran T_CLK_DIVR trig v(clk_divr) val=0.9 rise=1 td=800n targ v(clk_divr) val=0.9 rise=2 td=800n
+   print 1/T_CLK_DIVR
+   * plot clk_divr clk_divf
+.endc
+.end
+
+**** end user architecture code
+**.ends
+
+* expanding   symbol:  efx_pll96_sdiv_mm.sym # of pins=17
+** sym_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_sdiv_mm.sym
+** sch_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_sdiv_mm.sch
+.subckt efx_pll96_sdiv_mm p[3] clk p[2] p[1] q p[0] en[3] en[2] en[1] s[3] s[2] s[1] s[0] vdd gnd en[0] ens
+*.iopin gnd
+*.ipin clk
+*.opin q
+*.iopin vdd
+*.ipin p[3]
+*.ipin p[2]
+*.ipin p[1]
+*.ipin p[0]
+*.ipin en[3]
+*.ipin en[2]
+*.ipin en[1]
+*.ipin s[0]
+*.ipin s[1]
+*.ipin s[2]
+*.ipin s[3]
+*.ipin ens
+*.ipin en[0]
+xn clk_div23 clk mc vdd gnd vdd efx_pll96_sdiv23
+xp clk_div23 p[0] en[1] p[1] ld en[2] p[2] en[3] p[3] vdd gnd en[0] efx_pll96_sdiv_p
+xs clk_div23 s[0] s[1] s[3] s[2] ld mc vdd gnd ens efx_pll96_sdiv_s
+**** begin user architecture code
+
+* Copyright (c) Eric Fogleman 2026
+* SPDX-License-Identifier: Apache-2.0
+
+**** end user architecture code
+x1 clk ld q gnd gnd vdd vdd sky130_efx_lvdig__dfxtp_2
+.ends
+
+
+* expanding   symbol:  efx_pll96_div_r.sym # of pins=7
+** sym_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_div_r.sym
+** sch_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_div_r.sch
+.subckt efx_pll96_div_r en clk clk_r r[1] vdd gnd r[0]
+*.ipin clk
+*.iopin vdd
+*.iopin gnd
+*.ipin en
+*.ipin r[0]
+*.ipin r[1]
+*.opin clk_r
+xdff0 net6 net1 en net2 net1 gnd gnd vdd vdd sky130_efx_lvdig__dfrbp_2
+x1 net6 net2 r[0] net4 gnd gnd vdd vdd sky130_efx_lvdig__mux2_2
+x2 net4 net5 r[1] clk_r gnd gnd vdd vdd sky130_efx_lvdig__mux2_2
+xdff1 net2 net3 en net5 net3 gnd gnd vdd vdd sky130_efx_lvdig__dfrbp_2
+x3 clk en net6 gnd gnd vdd vdd sky130_efx_lvdig__and2_2
+**** begin user architecture code
+
+* Copyright (c) Eric Fogleman 2025
+* SPDX-License-Identifier: Apache-2.0
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  efx_pll96_sdiv23.sym # of pins=6
+** sym_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_sdiv23.sym
+** sch_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_sdiv23.sch
+.subckt efx_pll96_sdiv23 q2 clk mc vdd gnd en
+*.ipin clk
+*.ipin mc
+*.opin q2
+*.iopin vdd
+*.iopin gnd
+*.ipin en
+x3 q1 mc q2_b d2 gnd gnd vdd vdd sky130_efx_lvdig__o21a_1
+**** begin user architecture code
+
+* Copyright (c) Eric Fogleman 2026
+* SPDX-License-Identifier: Apache-2.0
+
+**** end user architecture code
+x1 clk q2_b en q1 gnd gnd vdd vdd sky130_efx_lvdig__edfxtp_1
+x2 clk d2 en q2 q2_b gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+.ends
+
+
+* expanding   symbol:  efx_pll96_sdiv_p.sym # of pins=12
+** sym_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_sdiv_p.sym
+** sch_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_sdiv_p.sch
+.subckt efx_pll96_sdiv_p clk p[0] en[1] p[1] q en[2] p[2] en[3] p[3] vdd gnd en[0]
+*.iopin vdd
+*.iopin gnd
+*.ipin clk
+*.ipin p[1]
+*.ipin p[2]
+*.ipin p[3]
+*.ipin en[3]
+*.ipin en[2]
+*.opin q
+*.ipin en[1]
+*.ipin p[0]
+*.ipin en[0]
+**** begin user architecture code
+
+* Copyright (c) Eric Fogleman 2025
+* SPDX-License-Identifier: Apache-2.0
+
+**** end user architecture code
+x5 q0 clk p[0] vdd gnd en[0] efx_pll96_sdiv23
+x8 q1 clk p[1] vdd gnd net2 efx_pll96_sdiv23
+x9 q0 en[1] net2 gnd gnd vdd vdd sky130_efx_lvdig__and2_1
+x10 q2 clk p[2] vdd gnd net3 efx_pll96_sdiv23
+x11 net2 q1 en[2] net3 gnd gnd vdd vdd sky130_efx_lvdig__and3_1
+x12 q3 clk p[3] vdd gnd net1 efx_pll96_sdiv23
+x7 net3 q2 en[3] net1 gnd gnd vdd vdd sky130_efx_lvdig__and3_1
+x1 q3 net4 q3_or_dis gnd gnd vdd vdd sky130_efx_lvdig__or2_1
+x2 en[3] net4 gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+x3 q2 net5 q2_or_dis gnd gnd vdd vdd sky130_efx_lvdig__or2_1
+x13 en[2] net5 gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+x14 q1 net6 q1_or_dis gnd gnd vdd vdd sky130_efx_lvdig__or2_1
+x15 en[1] net6 gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+x16 q0 net7 q0_or_dis gnd gnd vdd vdd sky130_efx_lvdig__or2_1
+x17 en[0] net7 gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+x18 q0_or_dis q1_or_dis q2_or_dis q3_or_dis q gnd gnd vdd vdd sky130_efx_lvdig__and4_2
+.ends
+
+
+* expanding   symbol:  efx_pll96_sdiv_s.sym # of pins=10
+** sym_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_sdiv_s.sym
+** sch_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_sdiv_s.sch
+.subckt efx_pll96_sdiv_s clk s[0] s[1] s[3] s[2] ld q vdd gnd en
+*.ipin s[1]
+*.ipin s[2]
+*.ipin s[3]
+*.ipin clk
+*.opin q
+*.ipin ld
+*.ipin s[0]
+*.ipin en
+*.iopin vdd
+*.iopin gnd
+**** begin user architecture code
+
+* Copyright (c) Eric Fogleman 2026
+* SPDX-License-Identifier: Apache-2.0
+
+**** end user architecture code
+x3 q[3] q[2] q[1] q[0] tc gnd gnd vdd vdd sky130_efx_lvdig__and4_2
+x27 tc tc_b gnd gnd vdd vdd sky130_efx_lvdig__inv_2
+x2 clk net6 en[0] q[0] net1 gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+x1 net1 net10 ld_d2 net6 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x5 clk net7 en[1] q[1] net2 gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+x6 net2 net11 ld_d2 net7 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x8 clk net8 en[2] q[2] net3 gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+x9 net3 net12 ld_d2 net8 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x11 clk net9 net4 q[3] net5 gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+x12 net5 net13 ld_d2 net9 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x4 tc_b ld_d2 en[0] gnd gnd vdd vdd sky130_efx_lvdig__or2_1
+x16 s[0] net10 gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+x20 en[0] q[0] ld_d2 en[1] gnd gnd vdd vdd sky130_efx_lvdig__a21o_1
+x7 en[1] q[1] ld_d2 en[2] gnd gnd vdd vdd sky130_efx_lvdig__a21o_1
+x10 en[2] q[2] ld_d2 net4 gnd gnd vdd vdd sky130_efx_lvdig__a21o_1
+x13 ld ld_d2 gnd gnd vdd vdd sky130_efx_lvdig__buf_2
+x17 s[1] net11 gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+x18 s[2] net12 gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+x19 s[3] net13 gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+x14 tc_b en q gnd gnd vdd vdd sky130_efx_lvdig__nand2_2
+.ends
+
+.GLOBAL GND
+.end

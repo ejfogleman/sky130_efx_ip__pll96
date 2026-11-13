@@ -10,6 +10,26 @@ untitled*
 *.drc
 *.cif
 *.spice
+*.png
+*.pdf
+*.eps
+*.csv
+
+# Exception: Allow png/pdf/eps in doc directory
+!doc/*.png
+!doc/*.pdf
+!doc/*.eps
+
+# Loop-filter working files (notebook, PDF and its markdown rendering), not published
+doc/pll-filter/
+
+# Simulation directory
+sim/*.txt
+# Testbench netlists in sim/ are tracked; *.raw and *.log above stay ignored
+!sim/**/*.spice
+# netlists that failed scripts/netlist_check.py
+sim/*.spice.bad
+sim/*.spice.err
 
 # General
 *.bak*
@@ -18,6 +38,11 @@ untitled*
 *.swo
 *.save
 *~
+.venv
+
+# Python cache
+__pycache__/
+*.pyc
 
 # OS files
 .DS_Store

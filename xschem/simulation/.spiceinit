@@ -1,5 +1,0 @@
-# set skywaterpdk
-set ngbehavior=hsa
-set ng_nomodcheck 
-set strict_errorhandling
-

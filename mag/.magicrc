@@ -1,1 +1,23 @@
-puts stdout "Sourcing cwd .magicrc"
+# Magic startup for this IP block. Run Magic in this directory (plain
+# "magic <cell>", which reads ./.magicrc), or elsewhere with
+# -rcfile mag/.magicrc; -rcfile <other> skips this file. New efx gencells are
+# saved beside the cell they are placed in; other new cells (a new top cell,
+# PDK gencells) in the directory Magic was started in.
+
+# Sky130 technology, DRC, extraction and device generators
+source $env(PDK_ROOT)/$env(PDK)/libs.tech/magic/$env(PDK).magicrc
+
+# efx lambda-grid generators and the "efx" menu. A copy of
+# ~/Projects/glayout_test/magic/efx.tcl, where it is developed and tested.
+source [file join [file dirname [file normalize [info script]]] efx.tcl]
+
+# Find cells of each dependency (git submodules in ../dependencies/<ip_block>/;
+# not recursive)
+foreach d [glob -nocomplain -type d [file dirname [file normalize [info script]]]/../dependencies/*/mag] {
+    addpath $d
+}
+
+# Key "a": select area (edit cell only), not Magic's default "select visible",
+# which also selects paint and labels inside subcells; a copy of that selection
+# then flattens gencell paint and pins (S0, D0, G, B) into the edit cell.
+macro a "select area"

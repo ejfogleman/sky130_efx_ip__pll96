@@ -1,0 +1,3 @@
+[submodule "dependencies/sky130_efx_ip__lvdig"]
+	path = dependencies/sky130_efx_ip__lvdig
+	url = ../sky130_efx_ip__lvdig.git

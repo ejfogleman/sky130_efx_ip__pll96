@@ -1,0 +1,135 @@
+** sch_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/tb_efx_pll96_div_f.sch
+
+* Copyright (c) Eric Fogleman 2026
+* SPDX-License-Identifier: Apache-2.0
+
+**.subckt tb_efx_pll96_div_f
+xdut c4 c3 c2 c1 c0 clk q vdd GND efx_pll96_div_f
+V1 clk GND 0 PULSE(0 {VDD} {TD_VCO} {T_RF} {T_RF} {T_VCO/2} {T_VCO})
+C1 q 0 {CLOAD} m=1
+V_VDD vdd GND {VDD}
+.save i(v_vdd)
+VC4 c4 GND {VC4}
+VC3 c3 GND {VC3}
+VC2 c2 GND {VC2}
+VC1 c1 GND {VC1}
+VC0 c0 GND {VC0}
+**** begin user architecture code
+
+* efx_pll96_div_f test
+.lib ~/.ciel/sky130A/libs.tech/combined/sky130.lib.spice tt
+
+*** efx_pll96_div_f code sweep
+*** run from sim/ with:
+*** ngspice -b -o tb_efx_pll96_div_f.out tb_efx_pll96_div_f.spice
+*** Every code c[4:0] in cmin..cmax is run in turn; the .out file gets one
+*** line per code: c, measured division ratio N (output period / clk period),
+*** and average vdd current (N=0: output not toggling). All runs are written
+*** to one .raw file.
+
+*** simulation setup
+.option temp=27
+.param VDD=1.8
+.param TD_VCO=2.5n
+.param T_RF=100p
+.param T_VCO=10.4167n
+.param CLOAD=10f
+*** code inputs (overwritten by the sweep below)
+.param VC0=0 VC1=0 VC2=0 VC3=0 VC4=0
+
+
+
+* lvdig standard cells (layout-extracted, C parasitics; symbols are primitives)
+.include /home/ejf/Projects/sky130_efx_ip__pll96/dependencies/sky130_efx_ip__lvdig/spice/sky130_efx_lvdig_c.spice
+
+
+* Run transient: sweep the division code
+.options reltol=1e-4 vntol=1e-7 abstol=1e-13
+.control
+   set cmin = 0
+   set cmax = 31
+   set num_threads = 1
+   set vdd = 1.8
+   set appendwrite
+   save clk q i(v_vdd)
+   let c = $cmin
+   set cc = $&c
+   while $cc <= $cmax
+      let c = $cc
+      let b0 = c - 2*floor(c/2)
+      let b1 = floor(c/2) - 2*floor(c/4)
+      let b2 = floor(c/4) - 2*floor(c/8)
+      let b3 = floor(c/8) - 2*floor(c/16)
+      let b4 = floor(c/16) - 2*floor(c/32)
+      let v0 = b0 * $vdd
+      alter vc0 = $&v0
+      let v1 = b1 * $vdd
+      alter vc1 = $&v1
+      let v2 = b2 * $vdd
+      alter vc2 = $&v2
+      let v3 = b3 * $vdd
+      alter vc3 = $&v3
+      let v4 = b4 * $vdd
+      alter vc4 = $&v4
+      tran 200p 3u
+      let vth = $vdd/2
+      let tq = 0
+      meas tran tclk trig v(clk) val=$&vth rise=1 td=1u targ v(clk) val=$&vth rise=6 td=1u
+      meas tran tq trig v(q) val=$&vth rise=1 td=1u targ v(q) val=$&vth rise=6 td=1u
+      meas tran idd avg i(v_vdd) from=1u to=3u
+      let n = tq/tclk
+      echo DIVF c= $cc N= $&n idd= $&idd
+      write tb_efx_pll96_div_f.raw
+      let c = $cc + 1
+      set cc = $&c
+   end
+.endc
+.end
+
+**** end user architecture code
+**.ends
+
+* expanding   symbol:  efx_pll96_div_f.sym # of pins=9
+** sym_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_div_f.sym
+** sch_path: /home/ejf/Projects/sky130_efx_ip__pll96/xschem/efx_pll96_div_f.sch
+.subckt efx_pll96_div_f c[4] c[3] c[2] c[1] c[0] clk clk_f vdd gnd
+*.ipin c[1]
+*.ipin c[2]
+*.ipin c[3]
+*.ipin clk
+*.opin clk_f
+*.ipin c[0]
+*.iopin vdd
+*.ipin c[4]
+*.iopin gnd
+**** begin user architecture code
+
+* Copyright (c) Eric Fogleman 2026
+* SPDX-License-Identifier: Apache-2.0
+
+**** end user architecture code
+x2 clk_bb net1 net7 q_b[0] gnd gnd vdd vdd sky130_efx_lvdig__dfxbp_2
+x1 q_b[0] c[0] ld net1 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x5 clk_bb net2 q_b[0] q[1] q_b[1] gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+x6 q_b[1] c[1] ld net2 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x8 clk_bb net3 t[2] q[2] q_b[2] gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+x9 q_b[2] c[2] ld net3 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x11 clk_bb net4 t[3] q[3] q_b[3] gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+x12 q_b[3] c[3] ld net4 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x15 clk_bb net5 t[4] q[4] q_b[4] gnd gnd vdd vdd sky130_efx_lvdig__edfxbp_1
+x21 q_b[4] c[4] ld net5 gnd gnd vdd vdd sky130_efx_lvdig__mux2_1
+x7 q_b[1] q_b[0] t[2] gnd gnd vdd vdd sky130_efx_lvdig__and2_1
+x17 q_b[3] t[3] t[4] gnd gnd vdd vdd sky130_efx_lvdig__and2_1
+x10 q_b[2] q_b[1] q_b[0] t[3] gnd gnd vdd vdd sky130_efx_lvdig__and3_1
+x16 clk_bb net6 clk_f gnd gnd vdd vdd sky130_efx_lvdig__dfxtp_2
+x14 clk clk_bb gnd gnd vdd vdd sky130_efx_lvdig__clkbuf_2
+* noconn #net7
+x3 q[1] q_b[0] net8 gnd gnd vdd vdd sky130_efx_lvdig__nor2_2
+x4 q[4] q[3] q[2] net9 gnd gnd vdd vdd sky130_efx_lvdig__nor3_2
+x13 net9 net8 ld_b net6 gnd gnd vdd vdd sky130_efx_lvdig__and3_1
+x18 ld_b ld gnd gnd vdd vdd sky130_efx_lvdig__inv_2
+x19 clk_f ld_b gnd gnd vdd vdd sky130_efx_lvdig__inv_1
+.ends
+
+.GLOBAL GND
+.end

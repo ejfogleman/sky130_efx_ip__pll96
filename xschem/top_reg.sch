@@ -4,8 +4,8 @@ K {}
 V {}
 S {}
 E {}
-C {title_ejf.sym} 200 -30 0 0 {name=l1 author="ejfogleman"}
-C {devices/code_shown.sym} 10 90 0 0 {name=s1 only_toplevel=false value="*** ejf_pll96 regression
+C {title_efx.sym} 200 -30 0 0 {name=l1 author="ejfogleman"}
+C {devices/code_shown.sym} 10 90 0 0 {name=s1 only_toplevel=false value="*** efx_pll96 regression
 *** run with:
 *** ngspice -b -r top_reg.raw -o top_reg.out top_reg.spice
 
@@ -28,7 +28,7 @@ C {devices/code_shown.sym} 10 90 0 0 {name=s1 only_toplevel=false value="*** ejf
 .include config.inc
 
 *** netlist and sim
-.include tb_ejf_pll96_top_template.spice
+.include tb_efx_pll96_top_template.spice
 "}
 C {copyright.sym} 0 10 0 0 {name=s3 place=header value="* Copyright (c) Eric Fogleman 2026 
 * SPDX-License-Identifier: Apache-2.0"}

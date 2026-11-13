@@ -1,0 +1,6 @@
+# Intentional exceptions for scripts/netlist_check.py, one per line:
+#   <subckt> <net>   # reason
+# <subckt> is the .subckt name, "<top>" for a testbench's top level, or "*".
+# Nets placed with the noconn symbol are skipped automatically; prefer that in
+# the schematic over an entry here. Never waive auto-named nets (net1, ...):
+# their names change when the schematic is edited.

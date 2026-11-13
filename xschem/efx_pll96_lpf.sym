@@ -1,0 +1,38 @@
+v {xschem version=3.4.7 file_version=1.2}
+G {}
+K {type=subcircuit
+format="@name @pinlist @symname"
+template="name=x1"
+}
+V {}
+S {}
+E {}
+L 4 -90 -40 90 -40 {}
+L 4 -90 40 90 40 {}
+L 4 -90 -40 -90 40 {}
+L 4 90 -40 90 40 {}
+L 7 90 -30 110 -30 {}
+L 7 0 40 0 60 {}
+L 7 90 30 110 30 {}
+L 7 -110 -20 -90 -20 {}
+L 7 -110 20 -90 20 {}
+L 7 -110 0 -90 0 {}
+L 7 20 40 20 60 {}
+B 5 107.5 -32.5 112.5 -27.5 {name=vdd dir=inout}
+B 5 -2.5 57.5 2.5 62.5 {name=vc dir=inout}
+B 5 107.5 27.5 112.5 32.5 {name=gnd dir=inout}
+B 5 -112.5 -22.5 -107.5 -17.5 {name=csc dir=in}
+B 5 -112.5 17.5 -107.5 22.5 {name=rsc[0] dir=in}
+B 5 -112.5 -2.5 -107.5 2.5 {name=rsc[1] dir=in}
+B 5 17.5 57.5 22.5 62.5 {name=vc2 dir=out}
+T {@symname} 0.5 -6 0 0 0.3 0.3 {hcenter=true}
+T {@name} 90 -52 0 0 0.2 0.2 {}
+T {vdd} 65 -34 0 0 0.2 0.2 {}
+T {vc} -5 26 0 0 0.2 0.2 {hcenter=true}
+T {gnd} 65 26 0 0 0.2 0.2 {}
+T {csc} -85 -24 0 0 0.2 0.2 {}
+T {rsc[0]} -85 16 0 0 0.2 0.2 {}
+T {rsc[1]} -85 -4 0 0 0.2 0.2 {}
+T { Copyright (c) 2025 Eric Fogleman
+ SPDX-License-Identifier: Apache-2.0} 0 -30 0 0 0.1 0.1 {vcenter=TRUE hcenter=TRUE}
+T {vc2} 15 26 0 0 0.2 0.2 {hcenter=true}

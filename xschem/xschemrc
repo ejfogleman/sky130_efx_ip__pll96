@@ -1,8 +1,23 @@
-# Source the PDK xschemrc file
+# xschem startup for this IP block. Run xschem in this directory (plain
+# "xschem", which reads ./xschemrc); --rcfile <other> skips this file.
+
+# Source the PDK xschemrc (only once, at the top level: a dependency's
+# xschemrc, sourced below, finds PDK already set)
 if {![info exists PDK]} {
     source $env(PDK_ROOT)/$env(PDK)/libs.tech/xschem/xschemrc
 }
 
-# Add current directory to xschem library path
+# Add this directory to the xschem library path
 append XSCHEM_LIBRARY_PATH :[file dirname [info script]]
 
+# Load each dependency's own xschemrc (recursive: they do the same).
+# Dependencies are git submodules in ../dependencies/<ip_block>/.
+foreach rc [glob -nocomplain [file dirname [info script]]/../dependencies/*/xschem/xschemrc] {
+    source $rc
+}
+
+# Netlists go to <project>/sim (created if missing), for ngspice run from the
+# command line there. Set after the dependency loop, so a dependency's own
+# setting doesn't win. "xschem -o <dir>" still overrides it.
+set local_netlist_dir 0
+set netlist_dir [file normalize [file dirname [info script]]/../sim]

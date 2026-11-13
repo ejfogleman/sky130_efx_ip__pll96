@@ -1,0 +1,11 @@
+# Python packages for design tools
+# Versions are the ones the notebook was last run with (Python 3.12).
+#
+#   python3 -m venv .venv
+#   .venv/bin/pip install -r requirements.txt
+#   .venv/bin/jupyter lab doc/pll-filter.ipynb
+#
+# Or, with VS Code's notebook editor instead of JupyterLab, ipykernel alone is
+# enough in place of jupyterlab.
+sympy==1.14.0
+jupyterlab==4.6.6
