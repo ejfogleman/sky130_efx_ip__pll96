@@ -122,7 +122,23 @@ With the loop open, stepping `vc` through these levels and measuring `clk_out` g
 
 # Test Plan
 
-TBD.
+## Equipment needed
+Will request access to test resources at UCSD for measurements
+* Programmable power supplies for 1.8-V core, 3.3-V IO
+* Signal generator for input reference clock
+* Spectrum analyzer or phase noise analyzer
+* Oscilloscope
+* DMM
+
+## Conditions
+* Full voltage range at room temp (may not have access to temp chamber)
+
+## To be tested
+* Frequency range
+* PLL lock time across modes and reference frequencies
+* Power consumption
+* Jitter, Phase Noise
+* Reference spur, other spurious
 
 
 # Reproducing the Results
