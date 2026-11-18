@@ -92,7 +92,8 @@ lvs/schematic/%.spice: xschem/%.sch $(SCH_FILES) $(CHECK_DEPS)
 
 # Re-run both checks on the existing sim/ netlists without re-netlisting
 check:
-	@ok=1; for n in $(wildcard sim/tb_*.spice); do \
+	@$(if $(wildcard sim/tb_*.spice),,echo "no sim/tb_*.spice netlists to check"; exit 0;) \
+	 ok=1; for n in $(wildcard sim/tb_*.spice); do \
 	  t=$$(basename $$n .spice); scripts/sch_check.sh $$n xschem/$$t.sch || ok=0; done; \
 	 $(CHECK) $(wildcard sim/tb_*.spice) || ok=0; [ $$ok = 1 ]
 
@@ -102,10 +103,17 @@ lvs/layout/%.spice: mag/%.mag $(MAG_FILES)
 	  'ext2spice lvs' 'ext2spice -p ../lvs/layout -o ../lvs/layout/$*.spice' \
 	  'quit -noprompt' | $(MAGIC)
 
-# Netgen report, remade when either netlist changes
-lvs/%.out: lvs/layout/%.spice lvs/schematic/%.spice
-	cd lvs && netgen -batch lvs "layout/$*.spice $*" "schematic/$*.spice $*" \
-	  $(NETGEN_SETUP) $*.out
+# Netgen report, remade when either netlist, a library below, or the script
+# changes. scripts/lvs.tcl reads every dependencies/*/cdl/*.cdl (e.g. lvdig's
+# sky130_efx_lvdig.cdl) into the schematic side ahead of the cell's netlist, so
+# Netgen has the definitions of cells whose symbols are primitives (xschem
+# writes only their instance lines). The library layouts' port numbers follow
+# the same (schematic) order.
+LVS_LIBS := $(wildcard dependencies/*/cdl/*.cdl)
+
+lvs/%.out: lvs/layout/%.spice lvs/schematic/%.spice $(LVS_LIBS) scripts/lvs.tcl
+	cd lvs && LVS_CELL=$* LVS_SETUP=$(NETGEN_SETUP) LVS_LIBS="$(LVS_LIBS:%=../%)" \
+	  netgen -batch source ../scripts/lvs.tcl
 
 # Netgen always exits 0, so check the report: make fails on a mismatch
 ifeq ($(CELL),)

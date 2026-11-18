@@ -1,17 +1,22 @@
 magic
 tech sky130A
-timestamp 1794964782
+timestamp 1794972532
 << locali >>
+rect 18 126 54 162
 rect 90 126 198 162
-use sky130_efx_lvdig__inv_1  sky130_efx_lvdig__inv_1_0 ~/Projects/sky130_efx_ip__pll96/mag/../dependencies/sky130_efx_ip__lvdig/mag
-timestamp 1794021122
-transform 1 0 0 0 1 18
-box 0 -54 144 342
-use sky130_efx_lvdig__inv_1  sky130_efx_lvdig__inv_1_1
+rect 234 126 252 162
+<< metal1 >>
+rect -72 288 0 360
+rect -72 -36 0 36
+use sky130_efx_lvdig__inv_1  sky130_efx_lvdig__inv_1_0
 timestamp 1794021122
 transform 1 0 144 0 1 18
 box 0 -54 144 342
-use sky130_efx_lvdig__tapvpwrvgnd_1  sky130_efx_lvdig__tapvpwrvgnd_1_0 ~/Projects/sky130_efx_ip__pll96/mag/../dependencies/sky130_efx_ip__lvdig/mag
+use sky130_efx_lvdig__inv_1  sky130_efx_lvdig__inv_1_2
+timestamp 1794021122
+transform 1 0 0 0 1 18
+box 0 -54 144 342
+use sky130_efx_lvdig__tapvpwrvgnd_1  sky130_efx_lvdig__tapvpwrvgnd_1_0
 timestamp 1794067076
 transform 1 0 -72 0 1 18
 box -18 -54 90 342

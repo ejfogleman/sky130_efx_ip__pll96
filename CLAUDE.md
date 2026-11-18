@@ -8,7 +8,7 @@ Analog/mixed-signal IP for SkyWater sky130: a 96 MHz integer-N clock-multiplier 
 
 ## Repository layout
 
-The repo follows `~/Projects/sky130_efx_ip__template` (same `Makefile` except the xschem exit-code handling below, `xschem/xschemrc`, `mag/.magicrc`, `mag/efx.tcl`, `.gitignore`); keep it in sync with that template rather than diverging. `xschem/` schematics and symbols, `sim/` testbench netlists and ngspice runs, `mag/` layout, `lvs/` generated LVS netlists and reports (git-ignored), `dependencies/` other IP blocks as git submodules (loaded automatically by `xschemrc` and `.magicrc`). `mag/efx.tcl` is MPL-2.0 (`LICENSE-MPL-2.0`) and is a copy of `~/Projects/glayout_test/magic/efx.tcl`, so don't edit it here; everything else is Apache-2.0. `mag/README.md` documents the efx lambda-grid layout method.
+The repo follows `~/Projects/sky130_efx_ip__template` (identical `Makefile` and the generic `scripts/`: `lvs.tcl`, `pex_ports.py`, `netlist_check.py`, `sch_check.sh`/`.tcl`; same `xschem/xschemrc`, `mag/.magicrc`, `mag/efx.tcl`, `.gitignore`); keep it in sync with that template rather than diverging. `xschem/` schematics and symbols, `sim/` testbench netlists and ngspice runs, `mag/` layout, `lvs/` generated LVS netlists and reports (git-ignored), `dependencies/` other IP blocks as git submodules (loaded automatically by `xschemrc` and `.magicrc`). `mag/efx.tcl` is MPL-2.0 (`LICENSE-MPL-2.0`) and is a copy of `~/Projects/glayout_test/magic/efx.tcl`, so don't edit it here; everything else is Apache-2.0. `mag/README.md` documents the efx lambda-grid layout method.
 
 ## Tooling and environment
 
@@ -25,6 +25,7 @@ The repo follows `~/Projects/sky130_efx_ip__template` (same `Makefile` except th
 make sim                              # netlist every xschem/tb_*.sch into sim/
 make sim/tb_efx_pll96_top_reg.spice   # one testbench
 make lvs CELL=efx_pll96_dbuf          # xschem + magic netlists, then netgen; fails on mismatch
+                                      # (schematic side also reads dependencies/*/cdl/*.cdl, for lvdig cells)
 make pex CELL=efx_pll96_vco_dlycell   # LVS, then lvs/pex_c/<cell>.spice (PEX=none|c|rc), ports in schematic order
 make clean-lvs
 make check                            # re-run both checks on sim/tb_*.spice

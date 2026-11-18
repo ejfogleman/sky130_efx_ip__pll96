@@ -1,6 +1,6 @@
 # Magic startup for this IP block. Run Magic in this directory (plain
-# "magic <cell>", which reads ./.magicrc), or elsewhere with
-# -rcfile mag/.magicrc; -rcfile <other> skips this file. New efx gencells are
+# "magic <cell>", which reads ./.magicrc): the dependency paths below are
+# relative to it; -rcfile <other> skips this file. New efx gencells are
 # saved beside the cell they are placed in; other new cells (a new top cell,
 # PDK gencells) in the directory Magic was started in.
 
@@ -12,8 +12,10 @@ source $env(PDK_ROOT)/$env(PDK)/libs.tech/magic/$env(PDK).magicrc
 source [file join [file dirname [file normalize [info script]]] efx.tcl]
 
 # Find cells of each dependency (git submodules in ../dependencies/<ip_block>/;
-# not recursive)
-foreach d [glob -nocomplain -type d [file dirname [file normalize [info script]]]/../dependencies/*/mag] {
+# not recursive). Relative paths, so Magic writes no directory in the use lines
+# of cells found here (an absolute path made layouts depend on the checkout's
+# location); Magic must therefore start in mag/.
+foreach d [glob -nocomplain -type d ../dependencies/*/mag] {
     addpath $d
 }
 
