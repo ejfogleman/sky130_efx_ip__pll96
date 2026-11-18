@@ -59,7 +59,7 @@ N 460 -810 500 -810 {
 lab=cpb1}
 N 460 -830 500 -830 {
 lab=cpb2}
-N 460 -750 500 -750 {
+N 460 -770 500 -770 {
 lab=csc}
 N 30 -250 30 -200 {
 lab=divr_en}
@@ -93,11 +93,11 @@ N 460 -650 500 -650 {
 lab=tst1}
 N 460 -630 500 -630 {
 lab=tst0}
-N 1310 -250 1310 -200 {
-lab=tst0}
 N 1390 -250 1390 -200 {
-lab=tst1}
+lab=tst0}
 N 1470 -250 1470 -200 {
+lab=tst1}
+N 1550 -250 1550 -200 {
 lab=tst2}
 N 20 -950 500 -950 {
 lab=clk}
@@ -105,9 +105,9 @@ N -50 -250 -50 -200 {
 lab=chp_en}
 N 460 -790 500 -790 {
 lab=cpb0}
-N 460 -730 500 -730 {
+N 460 -750 500 -750 {
 lab=rsc1}
-N 460 -710 500 -710 {
+N 460 -730 500 -730 {
 lab=rsc0}
 N 830 -250 830 -200 {
 lab=cpb1}
@@ -115,6 +115,10 @@ N 1070 -250 1070 -200 {
 lab=rsc1}
 N 1150 -250 1150 -200 {
 lab=rsc0}
+N 460 -690 500 -690 {
+lab=vco_en}
+N 1310 -250 1310 -200 {
+lab=vco_en}
 C {title_efx.sym} 200 0 0 0 {name=l1 author="ejfogleman"}
 C {devices/code_shown.sym} 10 120 0 0 {name=s1 only_toplevel=false value="* PLL top level testbench
 .lib ~/.ciel/sky130A/libs.tech/combined/sky130.lib.spice tt
@@ -133,6 +137,7 @@ C {devices/code_shown.sym} 10 120 0 0 {name=s1 only_toplevel=false value="* PLL 
 .param IB=1u
 .param VDIVR_EN=1.8
 .param VCHP_EN=1.8
+.param VVCO_EN=1.8
 .param VTST0=0
 .param VTST1=0
 .param VTST2=0
@@ -265,7 +270,7 @@ C {lab_wire.sym} 460 -810 0 0 {name=p43 sig_type=std_logic lab=cpb1
 }
 C {lab_wire.sym} 460 -830 0 0 {name=p44 sig_type=std_logic lab=cpb2
 }
-C {lab_wire.sym} 460 -750 0 0 {name=p45 sig_type=std_logic lab=csc
+C {lab_wire.sym} 460 -770 0 0 {name=p45 sig_type=std_logic lab=csc
 }
 C {vsource.sym} 30 -170 0 0 {name=V10 value=\{VDIVR_EN\} savecurrent=false}
 C {gnd.sym} 30 -140 0 0 {name=V13 lab=GND
@@ -301,27 +306,27 @@ C {lab_wire.sym} 460 -650 0 0 {name=p53 sig_type=std_logic lab=tst1
 }
 C {lab_wire.sym} 460 -630 0 0 {name=p54 sig_type=std_logic lab=tst0
 }
-C {vsource.sym} 1310 -170 0 0 {name=V42 value=\{VTST0\} savecurrent=false}
-C {gnd.sym} 1310 -140 0 0 {name=V43 lab=GND
+C {vsource.sym} 1390 -170 0 0 {name=V42 value=\{VTST0\} savecurrent=false}
+C {gnd.sym} 1390 -140 0 0 {name=V43 lab=GND
 value=\{VS3\}}
-C {lab_wire.sym} 1310 -250 0 1 {name=p55 sig_type=std_logic lab=tst0}
-C {vsource.sym} 1390 -170 0 0 {name=V44 value=\{VTST1\} savecurrent=false}
-C {gnd.sym} 1390 -140 0 0 {name=V45 lab=GND
+C {lab_wire.sym} 1390 -250 0 1 {name=p55 sig_type=std_logic lab=tst0}
+C {vsource.sym} 1470 -170 0 0 {name=V44 value=\{VTST1\} savecurrent=false}
+C {gnd.sym} 1470 -140 0 0 {name=V45 lab=GND
 value=\{VS3\}}
-C {lab_wire.sym} 1390 -250 0 1 {name=p56 sig_type=std_logic lab=tst1}
-C {vsource.sym} 1470 -170 0 0 {name=V46 value=\{VTST2\} savecurrent=false}
-C {gnd.sym} 1470 -140 0 0 {name=V47 lab=GND
+C {lab_wire.sym} 1470 -250 0 1 {name=p56 sig_type=std_logic lab=tst1}
+C {vsource.sym} 1550 -170 0 0 {name=V46 value=\{VTST2\} savecurrent=false}
+C {gnd.sym} 1550 -140 0 0 {name=V47 lab=GND
 value=\{VS3\}}
-C {lab_wire.sym} 1470 -250 0 1 {name=p57 sig_type=std_logic lab=tst2}
+C {lab_wire.sym} 1550 -250 0 1 {name=p57 sig_type=std_logic lab=tst2}
 C {vsource.sym} -50 -170 0 0 {name=V48 value=\{VCHP_EN\} savecurrent=false}
 C {gnd.sym} -50 -140 0 0 {name=V49 lab=GND
 value=\{VS3\}}
 C {lab_wire.sym} -50 -250 0 1 {name=p58 sig_type=std_logic lab=chp_en}
 C {lab_wire.sym} 460 -790 0 0 {name=p59 sig_type=std_logic lab=cpb0
 }
-C {lab_wire.sym} 460 -730 0 0 {name=p60 sig_type=std_logic lab=rsc1
+C {lab_wire.sym} 460 -750 0 0 {name=p60 sig_type=std_logic lab=rsc1
 }
-C {lab_wire.sym} 460 -710 0 0 {name=p61 sig_type=std_logic lab=rsc0
+C {lab_wire.sym} 460 -730 0 0 {name=p61 sig_type=std_logic lab=rsc0
 }
 C {vsource.sym} 830 -170 0 0 {name=V50 value=\{VCPB1\} savecurrent=false}
 C {gnd.sym} 830 -140 0 0 {name=V51 lab=GND
@@ -335,3 +340,9 @@ C {vsource.sym} 1150 -170 0 0 {name=V54 value=\{VRSC0\} savecurrent=false}
 C {gnd.sym} 1150 -140 0 0 {name=V55 lab=GND
 value=\{VS3\}}
 C {lab_wire.sym} 1150 -250 0 1 {name=p64 sig_type=std_logic lab=rsc0}
+C {lab_wire.sym} 460 -690 0 0 {name=p15 sig_type=std_logic lab=vco_en
+}
+C {vsource.sym} 1310 -170 0 0 {name=V4 value=\{VVCO_EN\} savecurrent=false}
+C {gnd.sym} 1310 -140 0 0 {name=V7 lab=GND
+value=\{VS3\}}
+C {lab_wire.sym} 1310 -250 0 1 {name=p16 sig_type=std_logic lab=vco_en}

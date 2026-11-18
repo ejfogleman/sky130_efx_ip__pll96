@@ -1,5 +1,4 @@
-v {xschem version=3.4.5 file_version=1.2
-}
+v {xschem version=3.4.7 file_version=1.2}
 G {}
 K {}
 V {}
@@ -15,16 +14,13 @@ N 180 -220 200 -220 {lab=gnd}
 N 120 -360 140 -360 {lab=inp}
 N 120 -220 140 -220 {lab=inp}
 N 180 -410 180 -390 {lab=vhi}
-N 180 -360 200 -360 {lab=vhi}
-N 200 -410 200 -360 {lab=vhi}
-N 180 -410 200 -410 {lab=vhi}
+N 180 -360 200 -360 {lab=vdd}
 N 200 -220 200 -160 {lab=gnd}
 N 120 -310 120 -220 {lab=inp}
 N 180 -160 200 -160 {lab=gnd}
 N 180 -190 180 -160 {lab=gnd}
 N 180 -270 180 -250 {lab=outn}
 N 200 -160 370 -160 {lab=gnd}
-N 200 -410 760 -410 {lab=vhi}
 N 570 -220 590 -220 {lab=gnd}
 N 630 -220 650 -220 {lab=outp}
 N 570 -220 570 -160 {lab=gnd}
@@ -36,9 +32,7 @@ N 760 -220 780 -220 {lab=gnd}
 N 820 -360 840 -360 {lab=inn}
 N 820 -220 840 -220 {lab=inn}
 N 780 -410 780 -390 {lab=vhi}
-N 760 -360 780 -360 {lab=vhi}
-N 760 -410 760 -360 {lab=vhi}
-N 760 -410 780 -410 {lab=vhi}
+N 760 -360 780 -360 {lab=vdd}
 N 760 -220 760 -160 {lab=gnd}
 N 840 -310 840 -220 {lab=inn}
 N 760 -160 780 -160 {lab=gnd}
@@ -69,8 +63,42 @@ N 750 -310 780 -310 {lab=outp}
 N 780 -330 780 -310 {lab=outp}
 N 80 -410 180 -410 {lab=vhi}
 N 80 -160 180 -160 {lab=gnd}
+N 200 -440 760 -440 {lab=vdd}
+N 760 -440 760 -360 {lab=vdd}
+N 200 -440 200 -360 {lab=vdd}
+N 80 -440 200 -440 {lab=vdd}
+N 920 -160 980 -160 {lab=gnd}
+N 980 -190 980 -160 {lab=gnd}
+N 980 -220 1000 -220 {lab=gnd}
+N 1000 -220 1000 -160 {lab=gnd}
+N 980 -160 1000 -160 {lab=gnd}
+N 920 -220 940 -220 {lab=gnd}
+N 920 -220 920 -160 {lab=gnd}
+N 920 -410 980 -410 {lab=vhi}
+N 980 -410 980 -390 {lab=vhi}
+N 920 -360 940 -360 {lab=vhi}
+N 760 -440 1000 -440 {lab=vdd}
+N 780 -160 920 -160 {lab=gnd}
+N 180 -410 780 -410 {lab=vhi}
+N 980 -360 1000 -360 {lab=vdd}
+N 1000 -440 1000 -360 {lab=vdd}
+N 980 -330 1020 -330 {lab=vhi}
+N 1020 -410 1020 -330 {lab=vhi}
+N 980 -410 1020 -410 {lab=vhi}
+N 920 -410 920 -360 {lab=vhi}
+N 780 -410 920 -410 {lab=vhi}
+N 1070 -160 1130 -160 {lab=gnd}
+N 1130 -190 1130 -160 {lab=gnd}
+N 1130 -220 1150 -220 {lab=gnd}
+N 1150 -220 1150 -160 {lab=gnd}
+N 1130 -160 1150 -160 {lab=gnd}
+N 1070 -220 1090 -220 {lab=gnd}
+N 1070 -220 1070 -160 {lab=gnd}
+N 1000 -160 1070 -160 {lab=gnd}
+N 980 -270 980 -250 {lab=outn}
+N 1130 -270 1130 -250 {lab=xxx}
 C {sky130_fd_pr/nfet_01v8.sym} 350 -220 0 0 {name=MN2P
-W=1.22
+W=1.26
 L=0.44
 nf=1
 mult=1
@@ -84,7 +112,7 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet_01v8.sym} 160 -220 0 0 {name=MN1P
-W=4.88
+W=5.04
 L=0.44
 nf=4
 mult=1
@@ -98,9 +126,9 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8_hvt.sym} 160 -360 0 0 {name=MP1P
-W=19.44	
+W=19.44
 L=0.44
-nf=6
+nf=4
 mult=1
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
@@ -112,7 +140,7 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet_01v8.sym} 610 -220 0 1 {name=MN2N
-W=1.22
+W=1.26
 L=0.44
 nf=1
 mult=1
@@ -126,7 +154,7 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet_01v8.sym} 800 -220 0 1 {name=MN1N
-W=4.88
+W=5.04
 L=0.44
 nf=4
 mult=1
@@ -141,8 +169,8 @@ spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8_hvt.sym} 800 -360 0 1 {name=MP1N
 W=19.44
-L=0.44	
-nf=6
+L=0.44
+nf=4
 mult=1
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
@@ -163,3 +191,48 @@ C {iopin.sym} 80 -160 0 1 {name=p12 lab=gnd}
 C {title_efx.sym} 200 -40 0 0 {name=l1 author="ejfogleman"}
 C {copyright.sym} 0 10 0 0 {name=s1 place=header value="* Copyright (c) Eric Fogleman 2025 
 * SPDX-License-Identifier: Apache-2.0"}
+C {iopin.sym} 80 -440 0 1 {name=p1 lab=vdd}
+C {sky130_fd_pr/nfet_01v8.sym} 960 -220 0 0 {name=MND1
+W=1.26
+L=0.44
+nf=1
+mult=1
+ad="'int((nf+1)/2) * W/nf * 0.29'" 
+pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
+as="'int((nf+2)/2) * W/nf * 0.29'" 
+ps="'2*int((nf+2)/2) * (W/nf + 0.29)'"
+nrd="'0.29 / W'" nrs="'0.29 / W'"
+sa=0 sb=0 sd=0
+model=nfet_01v8
+spiceprefix=X
+}
+C {sky130_fd_pr/pfet_01v8_hvt.sym} 960 -360 0 0 {name=MPD1[1:0]
+W=4.86
+L=0.44
+nf=1
+mult=1
+ad="'int((nf+1)/2) * W/nf * 0.29'" 
+pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
+as="'int((nf+2)/2) * W/nf * 0.29'" 
+ps="'2*int((nf+2)/2) * (W/nf + 0.29)'"
+nrd="'0.29 / W'" nrs="'0.29 / W'"
+sa=0 sb=0 sd=0
+model=pfet_01v8_hvt
+spiceprefix=X
+}
+C {sky130_fd_pr/nfet_01v8.sym} 1110 -220 0 0 {name=MND2
+W=1.26
+L=0.44
+nf=1
+mult=1
+ad="'int((nf+1)/2) * W/nf * 0.29'" 
+pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
+as="'int((nf+2)/2) * W/nf * 0.29'" 
+ps="'2*int((nf+2)/2) * (W/nf + 0.29)'"
+nrd="'0.29 / W'" nrs="'0.29 / W'"
+sa=0 sb=0 sd=0
+model=nfet_01v8
+spiceprefix=X
+}
+C {lab_wire.sym} 980 -270 0 0 {name=p2 sig_type=std_logic lab=outn}
+C {lab_wire.sym} 1130 -270 0 0 {name=p3 sig_type=std_logic lab=outp}

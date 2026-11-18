@@ -11,13 +11,16 @@
 # y = 0 to n*L. Rules are in PRIMITIVES.md, "Project layout conventions".
 # Implants and NPC are not painted; Magic generates them on GDS output.
 #
-# Gencells efx::nmos, efx::pmos, efx::ppolyres, efx::xpolyres and efx::mimcap:
+# Gencells efx::nmos, efx::pmos, efx::ppolyres, efx::xpolyres, efx::mimcap (met3/met4)
+# and efx::mimcap2 (met4/met5):
 # _defaults, _convert, _dialog, _check and _draw. The "efx" menu in the layout
 # window places them, and its "lambda grid + snap" entry sets an L grid.
 # efx::subring_draw and efx::nwring_draw paint a p-tap, or n-well and n-tap,
-# guard ring around the box, and efx::polycont_draw, efx::mcon_draw and
-# efx::via1_draw a poly contact, li-met1 contact or met1-met2 via filling it
-# (not gencells).
+# guard ring around the box, and efx::polycont_draw, efx::ndiffc_draw,
+# efx::pdiffc_draw, efx::psubdiffc_draw, efx::nsubdiffc_draw, efx::mcon_draw
+# and efx::via1_draw a poly contact, n or p diffusion contact, p or n tap
+# contact, li-met1 contact or met1-met2 via filling it (not gencells). efx::fixed_bbox ("fixed bbox from box") sets the edit cell's
+# FIXED_BBOX, its abutment outline, from the box on the L grid.
 
 global Opts
 namespace eval efx {
@@ -27,6 +30,7 @@ namespace eval efx {
     variable licon 0.17	;# licon width (licon.1)
     variable poly_min 0.15	;# poly width (poly.1a), the shortest gate
     variable licon_gate 0.055	;# diffusion licon to gate (licon.11)
+    variable tap_enc 0.12	;# tap past a licon in one direction (licon.7)
     # via1 contact area inset: via.5a / met2.5 0.085 less the 0.055 met1
     # border Magic's via1 type keeps round its cuts (squares-grid 55)
     variable via1_in 0.03
@@ -45,15 +49,23 @@ proc efx::addtechmenu {framename} {
     }
     magic::add_toolkit_menu $layoutframe "efx" efx
     magic::add_toolkit_command $layoutframe "lambda grid + snap" "efx::lambda_grid" efx
+    magic::add_toolkit_command $layoutframe "fixed bbox from box" "efx::fixed_bbox" efx
     magic::add_toolkit_separator $layoutframe efx
     magic::add_toolkit_command $layoutframe "nmos (lambda)" "magic::gencell efx::nmos" efx
     magic::add_toolkit_command $layoutframe "pmos (lambda)" "magic::gencell efx::pmos" efx
     magic::add_toolkit_command $layoutframe "ppolyres (lambda)" "magic::gencell efx::ppolyres" efx
     magic::add_toolkit_command $layoutframe "xpolyres (lambda)" "magic::gencell efx::xpolyres" efx
     magic::add_toolkit_command $layoutframe "mimcap (lambda)" "magic::gencell efx::mimcap" efx
+    magic::add_toolkit_command $layoutframe "mimcap2 met4/met5 (lambda)" "magic::gencell efx::mimcap2" efx
+    magic::add_toolkit_separator $layoutframe efx
     magic::add_toolkit_command $layoutframe "substrate guard ring (1.8V)" "efx::subring_draw" efx
     magic::add_toolkit_command $layoutframe "n-well guard ring (1.8V)" "efx::nwring_draw" efx
+    magic::add_toolkit_separator $layoutframe efx
     magic::add_toolkit_command $layoutframe "polycont" "efx::polycont_draw" efx
+    magic::add_toolkit_command $layoutframe "ndiffc (ndiff-li)" "efx::ndiffc_draw" efx
+    magic::add_toolkit_command $layoutframe "pdiffc (pdiff-li)" "efx::pdiffc_draw" efx
+    magic::add_toolkit_command $layoutframe "psubdiffc (p-tap-li)" "efx::psubdiffc_draw" efx
+    magic::add_toolkit_command $layoutframe "nsubdiffc (n-tap-li)" "efx::nsubdiffc_draw" efx
     magic::add_toolkit_command $layoutframe "mcon (li-met1)" "efx::mcon_draw" efx
     magic::add_toolkit_command $layoutframe "via1 (met1-met2)" "efx::via1_draw" efx
     magic::add_toolkit_separator $layoutframe efx
@@ -200,6 +212,21 @@ proc efx::pin {name x y {layer li}} {
     select clear
 }
 
+# 1 if the edit cell has paint of type layer under the box (a point box
+# counts the paint touching it). Leaves the selection cleared.
+proc efx::paint_at_box {layer} {
+    lassign [box values] x0 y0 x1 y1
+    pushbox
+    # box values reads internal units but takes bare numbers as lambda: say "i"
+    box values [expr {$x0 - 1}]i [expr {$y0 - 1}]i [expr {$x1 + 1}]i [expr {$y1 + 1}]i
+    select clear
+    select area $layer
+    set found [expr {[lindex [what -list] 0] ne {}}]
+    select clear
+    popbox
+    return $found
+}
+
 # Index of the edit cell's port called name, or "" if there is none. "port
 # <name> index" reads the selected label, not the name, so look it up. Needs a
 # selection command first: after a bare "load", "port first" returns "".
@@ -217,6 +244,9 @@ proc efx::port_index {name} {
 # is Magic's unscaled text, size then ignored (the dialog starts at FreeSans,
 # size L). index "" reuses the index of a port with the same name, else takes
 # the next free one. class / use "default" leave the port's.
+# layer nwell / pwell names a well's node, e.g. VPB / VNB in a cell with no
+# taps of its own (the tap cell beside it connects them). Magic counts pwell
+# as substrate, so a pwell label names the substrate node (otherwise VSUBS).
 proc efx::pin_place {name layer sticky font size just index class use} {
     if {$name eq {}} {
         puts stderr "efx: pin needs a name"
@@ -262,6 +292,9 @@ proc efx::pin_place {name layer sticky font size just index class use} {
     select area label
     if {[lindex [setlabel layer] 0] eq "space"} {
         puts stderr "efx: no paint under pin $name; it connects to nothing"
+    } elseif {$layer ne "default" && ![efx::paint_at_box $layer]} {
+        # a sticky label keeps its layer even with none of it under the box
+        puts stderr "efx: no $layer under pin $name; it connects to nothing"
     }
     if {$index eq {}} {port make} else {port make $index}
     if {$class ne "default"} {port class $class}
@@ -292,7 +325,7 @@ proc efx::pin_dialog {} {
         incr row
     }
     foreach {key text values} [list \
-        layer "Attach to layer" {default li m1 m2 m3 m4 m5} \
+        layer "Attach to layer" {default li m1 m2 m3 m4 m5 nwell pwell} \
         font "Font" [concat default [setlabel fontlist]] \
         just "Justification" {center N NE E SE S SW W NW} \
         class "Port class" {default input output inout tristate feedthrough} \
@@ -427,9 +460,9 @@ proc efx::mos_check {nmos parameters} {
     set tgate [dict get $parameters tgate]
     set bgate [dict get $parameters bgate]
 
-    if {![string is double -strict $n] || $n != round($n) || $n < 5} {
-        set n [expr {[string is double -strict $n] ? max(5, round($n)) : 9}]
-        puts stderr "efx: W = n*L needs a whole n >= 5; using n = $n"
+    if {![string is double -strict $n] || $n != round($n) || $n < 3} {
+        set n [expr {[string is double -strict $n] ? max(3, round($n)) : 5}]
+        puts stderr "efx: W = n*L needs a whole n >= 3; using n = $n"
     }
     if {![string is double -strict $fingers] || $fingers != round($fingers) || $fingers < 1} {
         set fingers [expr {[string is double -strict $fingers] ? max(1, round($fingers)) : 1}]
@@ -502,7 +535,7 @@ proc efx::mos_convert {parameters} {
 # Parameter window. W and the S/D pitch follow from n and length (shown as text).
 proc efx::mos_dialog {nmos parameters} {
     variable L
-    magic::add_entry n "W / L  (W = n x $L um, n >= 5)" $parameters
+    magic::add_entry n "W / L  (W = n x $L um, n >= 3)" $parameters
     magic::add_entry fingers "Fingers" $parameters
     magic::add_entry length "Gate length (um, >= 0.15)" $parameters
     # Not last: gencell_getparams reads the widgets newest first and fails
@@ -518,8 +551,8 @@ proc efx::mos_dialog {nmos parameters} {
 }
 
 # Defaults as efx_primitives.nmos()/pmos()
-proc efx::nmos_defaults {} {return {n 9 fingers 2 length 0.18 butted 0 ltap 1 rtap 1 vt std tgate 1 bgate 0}}
-proc efx::pmos_defaults {} {return {n 9 fingers 2 length 0.18 butted 0 ltap 1 rtap 1 vt std tgate 0 bgate 1}}
+proc efx::nmos_defaults {} {return {n 5 fingers 2 length 0.18 butted 0 ltap 1 rtap 1 vt std tgate 1 bgate 0}}
+proc efx::pmos_defaults {} {return {n 5 fingers 2 length 0.18 butted 0 ltap 1 rtap 1 vt std tgate 0 bgate 1}}
 
 proc efx::nmos_convert {parameters} {return [efx::mos_convert $parameters]}
 proc efx::pmos_convert {parameters} {return [efx::mos_convert $parameters]}
@@ -532,31 +565,50 @@ proc efx::nmos_draw {parameters} {return [efx::mos_draw 1 $parameters]}
 proc efx::pmos_draw {parameters} {return [efx::mos_draw 0 $parameters]}
 
 # ---------------------------------------------------------------------------
-# p+ poly resistors: one vertical poly stripe nw*L wide with a body nl*L long, as
+# p+ poly resistors: one vertical poly stripe w um wide with a body nl*L long, as
 # efx_primitives.ppolyres()/xpolyres(). Centred on x = 0, bottom at y = 0:
 # 12L head of xpc, body, 12L head. Ports R1 (bottom), R2 (top).
 #   ppolyres  res_high_po, 319.8 ohm/sq:   body xhrpoly
 #   xpolyres  res_xhigh_po, 2000 ohm/sq:   body uhrpoly
+# The width is in um, not L (2026-11-17): the foundry models come in fixed
+# widths, 0.35, 0.69, 1.41, 2.85 and 5.73, which are off the L grid. w >= 0.35,
+# on a 0.01 grid so the centred edges stay on the 0.005 manufacturing grid.
+# The poly (xpc heads and body) is exactly w wide; the li over each head is
+# w rounded up to a whole number of L, both centred on x = 0, so the li edges
+# stay on the L/2 grid that the rest of an efx layout routes to.
 # Magic generates RPM/URPM, psdm, NPC, poly.res and the 0.19 x 2.0 resistor
-# licons from xpc on GDS output. Widths start at 4L (Python's RPM, 2L past the
-# poly, is then 1.44 >= rpm.1a 1.27), but Magic's RPM is only 0.2 past the
-# poly: at 4L it is 1.12 and fails rpm.1a, which only KLayout checks. 5L passes.
-# 4L, 8L, 16L, 32L are 0.03 above the foundry widths 0.69, 1.41, 2.85, 5.73.
+# licons from xpc on GDS output. Magic's RPM/URPM is only 0.2 past the poly,
+# so a lone resistor narrower than 0.87 fails rpm.1a / urpm.1a (1.27) in
+# KLayout and in Magic's drc(full); resistors 2L apart merge their RPM.
 
 namespace eval efx {
     variable polyres_head 12	;# head height in L: the 2.0 cut + li.5 0.08 at each end
-    variable polyres_nwmin 4
+    variable polyres_wmin 0.35	;# um, the narrowest foundry model
     variable polyres {ppolyres {xhrpoly 319.8} xpolyres {uhrpoly 2000}}	;# body type, ohm/sq
+}
+
+# Cells saved before 2026-11-17 carry nw (width in L); read it as w = nw*L
+proc efx::polyres_compat {parameters} {
+    variable L
+    if {[dict exists $parameters nw] && ![dict exists $parameters w]} {
+        dict set parameters w [expr {round([dict get $parameters nw] * $L * 1000) / 1000.0}]
+    }
+    return [dict remove $parameters nw]
 }
 
 proc efx::polyres_draw {kind parameters} {
     variable L
     variable polyres
     variable polyres_head
+    set parameters [efx::polyres_compat $parameters]
     set body [lindex [dict get $polyres $kind] 0]
     dict with parameters {}
-    set x0 [expr {-$nw * $L / 2.0}]
-    set x1 [expr {$nw * $L / 2.0}]
+    set x0 [expr {-$w / 2.0}]
+    set x1 [expr {$w / 2.0}]
+    # li: w rounded up to whole L, centred
+    set nli [expr {int(ceil($w / $L - 1e-6))}]
+    set lx0 [expr {-$nli * $L / 2.0}]
+    set lx1 [expr {$nli * $L / 2.0}]
     set hh [expr {$polyres_head * $L}]
     set y1 [expr {$hh + $nl * $L}]
     set h [expr {2 * $hh + $nl * $L}]
@@ -565,7 +617,7 @@ proc efx::polyres_draw {kind parameters} {
     # The whole head is the resistor contact; li over it
     foreach y [list 0 $y1] {
         rect xpc $x0 $y $x1 [expr {$y + $hh}]
-        rect li $x0 $y $x1 [expr {$y + $hh}]
+        rect li $lx0 $y $lx1 [expr {$y + $hh}]
     }
     rect $body $x0 $hh $x1 $y1
     # Ports on li, L/2 from the outer end of each head
@@ -574,28 +626,38 @@ proc efx::polyres_draw {kind parameters} {
     popbox
 }
 
-# Whole nw >= 4 and nl >= 1; bad values are corrected with a message, as mos_check
+# w >= 0.35 on a 0.01 grid, whole nl >= 1; bad values are corrected with a
+# message, as mos_check
 proc efx::polyres_check {kind parameters} {
-    variable polyres_nwmin
-    foreach {key min} [list nw $polyres_nwmin nl 1] {
-        set v [dict get $parameters $key]
-        if {![string is double -strict $v] || $v != round($v) || $v < $min} {
-            set v [expr {[string is double -strict $v] ? max($min, round($v)) : $min}]
-            puts stderr "efx: $key must be a whole number >= $min; using $key = $v"
-        }
-        dict set parameters $key [expr {int($v)}]
+    variable polyres_wmin
+    set parameters [efx::polyres_compat $parameters]
+    set v [dict get $parameters w]
+    if {![string is double -strict $v]} {
+        set w $polyres_wmin
+    } else {
+        set w [expr {max($polyres_wmin, round($v * 100) / 100.0)}]
     }
+    if {![string is double -strict $v] || abs($w - $v) > 1e-9} {
+        puts stderr "efx: w must be >= $polyres_wmin um, on a 0.01 grid; using w = $w"
+    }
+    dict set parameters w $w
+    set v [dict get $parameters nl]
+    if {![string is double -strict $v] || $v != round($v) || $v < 1} {
+        set v [expr {[string is double -strict $v] ? max(1, round($v)) : 1}]
+        puts stderr "efx: nl must be a whole number >= 1; using nl = $v"
+    }
+    dict set parameters nl [expr {int($v)}]
     return $parameters
 }
 
-# SPICE w and l (plain um, see mos_convert) to nw and nl, rounded by _check.
+# SPICE w and l (plain um, see mos_convert) to w and nl, rounded by _check.
 # Magic extracts l as the poly.res length, 0.16 past the body.
 proc efx::polyres_convert {kind parameters} {
     variable L
     set out [dict create]
     dict for {key value} $parameters {
         switch -nocase $key {
-            w {dict set out nw [magic::3digitpastdecimal [expr {[magic::spice2float $value] / $L}]]}
+            w {dict set out w [magic::3digitpastdecimal [magic::spice2float $value]]}
             l {dict set out nl [magic::3digitpastdecimal [expr {([magic::spice2float $value] - 0.16) / $L}]]}
             default {dict set out $key $value}
         }
@@ -606,15 +668,15 @@ proc efx::polyres_convert {kind parameters} {
 proc efx::polyres_dialog {kind parameters} {
     variable L
     variable polyres
-    variable polyres_nwmin
+    variable polyres_wmin
     set rho [lindex [dict get $polyres $kind] 1]
-    magic::add_message rule "R = $rho ohm/sq x nl / nw, plus the heads" $parameters
-    magic::add_entry nw "Width / L  (W = nw x $L um, nw >= $polyres_nwmin)" $parameters
+    magic::add_message rule "R = $rho ohm/sq x nl x $L / w, plus the heads" $parameters
+    magic::add_entry w "Width, um  (w >= $polyres_wmin; foundry 0.35 0.69 1.41 2.85 5.73)" $parameters
     magic::add_entry nl "Length / L  (body = nl x $L um, nl >= 1)" $parameters
 }
 
-proc efx::ppolyres_defaults {} {return {nw 5 nl 10}}
-proc efx::xpolyres_defaults {} {return {nw 5 nl 10}}
+proc efx::ppolyres_defaults {} {return {w 1.41 nl 10}}
+proc efx::xpolyres_defaults {} {return {w 1.41 nl 10}}
 foreach kind {ppolyres xpolyres} {
     foreach p {draw check convert dialog} {
         proc efx::${kind}_$p {parameters} "return \[efx::polyres_$p $kind \$parameters\]"
@@ -697,6 +759,88 @@ proc efx::mimcap_dialog {parameters} {
 
 proc efx::mimcap_defaults {} {return {nw 10 nl 10}}
 
+# ---------------------------------------------------------------------------
+# MiM capacitor 2 (sky130_fd_pr__cap_mim_m3_2), as efx_primitives.mimcap2():
+# efx::mimcap one metal up. cap2m (Magic mimcap2) nw*L x nl*L, centred on
+# x = 0, L above the cell bottom (y = 0).
+#   C2  met4 plate, L past cap2m all round (cap2m.3 0.14); the parent connects to it
+#   C1  met5 plate, L inside cap2m, on mim2cc (via4 to cap2m)
+# Magic fills mim2cc with via4 (squares-grid: 0.8 at 1.6 pitch after a 0.19
+# border). The mim2cc area is the Python cell's cut region (0.31 inside the
+# met5, m5.3) grown by that border: 0.12 inside the met5, as the deck's
+# mim2cc/m5 surround asks.
+# nw, nl >= 11 and (nw - 2)(nl - 2) L^2 >= 4.0, for the met5 plate's width (m5.1
+# 1.6) and area (m5.4 4.0); cap2m.1 (1.0) alone would allow 6.
+# Placed on an efx::mimcap of the same nw, nl at the same point, it stacks: the
+# met4 plates merge, and mim2cc lies inside mimcc (cap2m.8 "must not cross").
+
+namespace eval efx {
+    variable mim2_nmin 11	;# met5 plate (n - 2)L >= 1.6 (m5.1)
+    variable met5_area 4.0	;# m5.4
+    variable via4_enc 0.31	;# met5 enclosure of via4 (m5.3)
+    variable mim2cc_border 0.19	;# squares-grid border of via4 (mim2cc) in sky130A.tech
+}
+
+proc efx::mimcap2_draw {parameters} {
+    variable L
+    variable via4_enc
+    variable mim2cc_border
+    dict with parameters {}
+    set x0 [expr {-$nw * $L / 2.0}]
+    set x1 [expr {$nw * $L / 2.0}]
+    set h [expr {$nl * $L}]
+
+    pushbox
+    rect m4 [expr {$x0 - $L}] 0 [expr {$x1 + $L}] [expr {$h + 2 * $L}]
+    rect mimcap2 $x0 $L $x1 [expr {$h + $L}]
+    rect m5 [expr {$x0 + $L}] [expr {2 * $L}] [expr {$x1 - $L}] $h
+    set e [expr {$via4_enc - $mim2cc_border}]
+    rect mim2cc [expr {$x0 + $L + $e}] [expr {2 * $L + $e}] [expr {$x1 - $L - $e}] [expr {$h - $e}]
+    # Ports L/2 inside the bottom edge of the met4 plate and the top edge of the met5 plate
+    pin C2 0 [expr {$L / 2.0}] m4
+    pin C1 0 [expr {$h - $L / 2.0}] m5
+    popbox
+}
+
+# Whole nw, nl >= 11; then, if the met5 plate is under 4.0 um^2 (m5.4), nl grows
+# until it isn't. Bad values are corrected with a message, as mimcap_check.
+proc efx::mimcap2_check {parameters} {
+    variable L
+    variable mim2_nmin
+    variable met5_area
+    foreach key {nw nl} {
+        set v [dict get $parameters $key]
+        if {![string is double -strict $v] || $v != round($v) || $v < $mim2_nmin} {
+            set v [expr {[string is double -strict $v] ? max($mim2_nmin, round($v)) : $mim2_nmin}]
+            puts stderr "efx: $key must be a whole number >= $mim2_nmin; using $key = $v"
+        }
+        dict set parameters $key [expr {int($v)}]
+    }
+    set nw [dict get $parameters nw]
+    set nl [dict get $parameters nl]
+    if {($nw - 2) * ($nl - 2) * $L * $L < $met5_area - 1e-9} {
+        set nl [expr {2 + int(ceil($met5_area / ($L * $L * ($nw - 2)) - 1e-9))}]
+        puts stderr "efx: the met5 plate needs (nw - 2)(nl - 2) L^2 >= $met5_area um^2 (m5.4); using nl = $nl"
+        dict set parameters nl $nl
+    }
+    return $parameters
+}
+
+# The same as mimcap's: SPICE w and l to nw and nl
+proc efx::mimcap2_convert {parameters} {return [efx::mimcap_convert $parameters]}
+
+proc efx::mimcap2_dialog {parameters} {
+    variable L
+    variable mim2_nmin
+    # carea and cperi as the PDK's cap_mim_m3_2 defaults
+    magic::add_message rule "C = 2.0 fF/um2 x area + 0.19 fF/um x perimeter" $parameters
+    magic::add_message rule2 "met5 plate (nw - 2)(nl - 2) L^2 >= 4.0 um2 (m5.4): 14 x 14 or 11 x 16 at least" $parameters
+    magic::add_entry nw "Width / L  (w = nw x $L um, nw >= $mim2_nmin)" $parameters
+    magic::add_entry nl "Length / L  (l = nl x $L um, nl >= $mim2_nmin)" $parameters
+}
+
+proc efx::mimcap2_defaults {} {return {nw 14 nl 14}}
+
 # 1.8 V guard ring, drawn like sky130::subconn_guard_draw / nwell_draw (paint
 # in the edit cell, not a gencell), but with the box as the ring's inner
 # boundary. Each edge of the box is grown out to the L grid. The ring is 2L of
@@ -723,6 +867,27 @@ proc efx::lambda_box {} {
         puts stderr [format "efx: box grown out to the L grid: (%.3f %.3f) (%.3f %.3f)" $x0 $y0 $x1 $y1]
     }
     return [list $x0 $y0 $x1 $y1]
+}
+
+# Fixed bounding box of the edit cell: the box, each edge grown out to the L
+# grid, becomes the cell's FIXED_BBOX property, as in the sky130_fd_sc_hd
+# cells. Magic then draws an instance's outline from it and places an instance
+# by it (its lower-left corner on the box), so cells abut box to box; paint
+# may hang over it (shared rails, n-well). The property applies to the edit
+# cell even when an instance is selected. Set from [box values], so it is in
+# Magic's internal units, which Magic rescales on save.
+proc efx::fixed_bbox {} {
+    # check before snapping: lambda_box grows a zero-size box to one L square
+    lassign [box values] bx0 by0 bx1 by1
+    if {$bx1 <= $bx0 || $by1 <= $by0} {
+        puts stderr "efx: the box has no area; FIXED_BBOX not set"
+        return
+    }
+    lassign [efx::lambda_box] x0 y0 x1 y1
+    box ${x0}um ${y0}um ${x1}um ${y1}um
+    property FIXED_BBOX [box values]
+    puts stdout [format "efx: FIXED_BBOX of %s: (%.3f %.3f) (%.3f %.3f) um" \
+        [cellname list self] $x0 $y0 $x1 $y1]
 }
 
 proc efx::ring_draw {dtype ctype well} {
@@ -779,6 +944,54 @@ proc efx::polycont_draw {} {
     rect poly $x0 $y0 $x1 $y1
     rect li $x0 $y0 $x1 $y1
     rect pc [expr {$x0 + $in}] [expr {$y0 + $in}] [expr {$x1 - $in}] [expr {$y1 - $in}]
+    popbox
+    tech revert
+    resumeall
+}
+
+# Diffusion contact filling the box, as efx::polycont_draw with ndiff or pdiff
+# in place of poly: diffusion and li flush with the box, and one ndc / pdc
+# contact area inset (2L - licon)/2 all round, which Magic fills with licons
+# (0.095 > licon.5a / licon.5c 0.04 / 0.06). The box is grown out to the L
+# grid; at least 2L x 2L. Magic generates the implant; no n-well is painted,
+# so a pdiffc needs one from its surroundings (diff/tap.8, L). Paint in the
+# edit cell, not a gencell, with no label. As efx_primitives.ndiffc() / pdiffc().
+proc efx::ndiffc_draw {} {diffc_draw ndiff ndc}
+proc efx::pdiffc_draw {} {diffc_draw pdiff pdc}
+# Tap contacts, the same with p-tap (psubdiff) or n-tap (nsubdiff), as one
+# side of the guard rings. No well: an nsubdiffc needs an n-well from its
+# surroundings, L past it (diff/tap.10). As efx_primitives.psubdiffc() / nsubdiffc().
+# At least 2L x 3L (either way round): a tap must enclose its licon by 0.12 in
+# one direction (licon.7), and Magic checks that on the contact area, not the
+# cuts. So the area is inset tap_enc (0.12) at the ends of the longer side
+# (y when square) and (2L - licon)/2 (0.095) across it.
+proc efx::psubdiffc_draw {} {diffc_draw psd psc 3}
+proc efx::nsubdiffc_draw {} {diffc_draw nsd nsc 3}
+
+# long: the longer side's minimum in L (2, or 3 for a tap, whose contact area
+# is then inset tap_enc along that side)
+proc efx::diffc_draw {dtype ctype {long 2}} {
+    variable L
+    variable licon
+    variable tap_enc
+    lassign [lambda_box] x0 y0 x1 y1
+    set short [expr {min($x1 - $x0, $y1 - $y0)}]
+    if {$short < 2 * $L - 1e-6 || max($x1 - $x0, $y1 - $y0) < $long * $L - 1e-6} {
+        puts stderr "efx: $ctype must be at least 2L x ${long}L ([expr {2 * $L}] x [expr {$long * $L}]um), for a licon"
+        return
+    }
+    set in [expr {(2 * $L - $licon) / 2.0}]
+    set ix $in
+    set iy $in
+    if {$long > 2} {
+        if {$y1 - $y0 >= $x1 - $x0 - 1e-6} {set iy $tap_enc} else {set ix $tap_enc}
+    }
+    suspendall
+    tech unlock *
+    pushbox
+    rect $dtype $x0 $y0 $x1 $y1
+    rect li $x0 $y0 $x1 $y1
+    rect $ctype [expr {$x0 + $ix}] [expr {$y0 + $iy}] [expr {$x1 - $ix}] [expr {$y1 - $iy}]
     popbox
     tech revert
     resumeall

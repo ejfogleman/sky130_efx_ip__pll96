@@ -1,6 +1,8 @@
 # The efx lambda methodology (Magic)
 
-How to lay out Sky130 analog cells by hand in Magic with the **efx** generators, on a lambda grid.
+(c) 2026 Eric Fogleman
+
+A methodology for drawing layout in Magic VLSI with the **efx** generators, on a lambda grid.
 
 - **L (lambda) = 0.18 µm**: the drawing unit. Every width, space and generator size is a whole multiple of L, chosen at or above the Sky130 minimums. So a layout drawn on the L grid is DRC-clean by construction, and its edges line up. This L is the project's unit, not Magic's internal "lambda".
 - **efx** is a set of Magic generators in `efx.tcl`, with an **efx** menu in every layout window:
@@ -99,12 +101,16 @@ Starting in `mag/` is the simplest habit.
 | Entry | What it makes | What the box means | Minimum | Kind |
 |---|---|---|---|---|
 | lambda grid + snap | grid L, snap to it | — | — | command |
-| nmos / pmos (lambda) | MOS transistor (section 5) | where it is placed | n ≥ 5 | gencell |
-| ppolyres / xpolyres (lambda) | p+ poly resistor | where it is placed | nw ≥ 4 (5 for a lone resistor in KLayout) | gencell |
+| fixed bbox from box | the edit cell's `FIXED_BBOX` (below) | the outline, grown out to the L grid | non-zero area | command |
+| nmos / pmos (lambda) | MOS transistor (section 5) | where it is placed | n ≥ 3 | gencell |
+| ppolyres / xpolyres (lambda) | p+ poly resistor | where it is placed | w ≥ 0.35 µm (0.87 for a lone resistor in KLayout) | gencell |
 | mimcap (lambda) | MiM capacitor, met3 / met4 | where it is placed | nw, nl ≥ 6 | gencell |
+| mimcap2 met4/met5 (lambda) | MiM capacitor, met4 / met5 | where it is placed | nw, nl ≥ 11, met5 plate ≥ 4 µm² | gencell |
 | substrate guard ring (1.8V) | p-tap ring, 2L | the ring's **inner** edge | 3L × 3L inside | flat paint |
 | n-well guard ring (1.8V) | n-tap ring + n-well | the ring's **inner** edge | 3L × 3L inside | flat paint |
 | polycont | poly + li + licons | the **outer** edge | 2L × 2L | flat paint |
+| ndiffc / pdiffc | n+ / p+ diffusion + li + licons (no n-well) | the **outer** edge | 2L × 2L | flat paint |
+| psubdiffc / nsubdiffc | p-tap / n-tap + li + licons (no n-well) | the **outer** edge | 2L × 3L, either way | flat paint |
 | mcon (li-met1) | li + met1 + mcon | the **outer** edge | 2L × 2L | flat paint |
 | via1 (met1-met2) | met1 + met2 + via1 | the **outer** edge | 2L × 2L | flat paint |
 | pin ... | a label made a port (section 8) | where the pin goes | — | dialog |
@@ -119,6 +125,11 @@ Starting in `mag/` is the simplest habit.
 - A box below the minimum is refused.
 - It can't be re-edited: erase it and redraw.
 
+**Fixed bbox:** the cell's abutment outline, as in the `sky130_fd_sc_hd` standard cells.
+- Magic draws an instance's outline from it and places an instance by it, its lower-left corner on the box. Cells then abut box to box, and paint may hang over the outline (shared rails, n-well).
+- It applies to the edit cell, even when an instance is selected. Save the cell to keep it.
+- `property FIXED_BBOX` prints it, in Magic's internal units (0.005 µm here).
+
 **efx contacts fill the box.** Both metals are flush with the box and the cuts sit inside it, so every metal edge stays on the L grid. The PDK's own vias (Devices 1 menu) do the opposite: they paint the contact on the box and grow the metal past it, off the grid.
 
 ## 5. The generators
@@ -127,7 +138,7 @@ Starting in `mag/` is the simplest habit.
 
 | Parameter | Default | Meaning |
 |---|---|---|
-| `n` | 9 | W = n·L per finger, n ≥ 5 (W ≥ 0.90) |
+| `n` | 5 | W = n·L per finger, n ≥ 3 (W ≥ 0.54) |
 | `fingers` | 2 | number of gates |
 | `length` | 0.18 | gate length in µm: ≥ 0.15 (poly.1a), on a 0.01 grid |
 | `butted` | off | taps butted against the outer sources (source = body); even finger counts only |
@@ -156,9 +167,9 @@ Starting in `mag/` is the simplest habit.
 
 **Licons per S/D column and tap:** `floor((n − 1) / 2)`.
 
-| n | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
-|---|---|---|---|---|---|---|---|---|---|---|
-| licons | 2 | 2 | 3 | 3 | 4 | 4 | 5 | 5 | 6 | 6 |
+| n | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| licons | 1 | 1 | 2 | 2 | 3 | 3 | 4 | 4 | 5 | 5 | 6 | 6 |
 
 **Pins:**
 - `S0 D0 S1 D1 …` on the S/D columns. Sources and drains are not joined; wire them in the parent.
@@ -177,27 +188,28 @@ Starting in `mag/` is the simplest habit.
 |---|---|---|
 | Device | `sky130_fd_pr__res_high_po` | `sky130_fd_pr__res_xhigh_po` |
 | Sheet resistance | 319.8 Ω/□ | 2000 Ω/□ |
-| Width | nw·L, nw ≥ 4 | the same |
+| Width | w in µm, w ≥ 0.35, on a 0.01 grid | the same |
 | Body length | nl·L, nl ≥ 1 | the same |
 
 **Geometry:**
 - One vertical poly stripe: a 12L contact head, the body, and another 12L head.
 - Each head holds 0.19 × 2.0 resistor licons, side by side across the width.
+- The poly is exactly w wide. The li over each head is w rounded up to the next whole L, centred with the poly, so the li stays on the L/2 grid you route to.
 - Magic generates RPM/URPM, the implant and NPC.
 
 **Extraction:**
 - l = nl·L + 0.16, because poly.res runs to the cuts.
-- Every lambda width extracts as the generic model with `w` and `l`.
-- 4L, 8L, 16L and 32L are within 0.03 of the characterised widths 0.69, 1.41, 2.85 and 5.73.
+- The characterised widths 0.35, 0.69, 1.41, 2.85 and 5.73 extract as their own models (`sky130_fd_pr__res_high_po_0p35` …, `l` only). Use one of them where you can.
+- Any other width extracts as the generic model with `w` and `l`, interpolated between the characterised ones.
 
 **Pins:**
 - `R1` at the bottom, `R2` at the top.
 - There is no body pin; the body is the substrate or well.
 
-**A lone 4L resistor fails rpm.1a in KLayout**: RPM must be ≥ 1.27, and Magic draws it only 0.2 past the poly. Use 5L, or place 4L resistors 2L apart, so their RPMs merge.
+**A lone resistor narrower than 0.87 fails rpm.1a in KLayout** (the 0.35 and 0.69 foundry widths): RPM must be ≥ 1.27, and Magic draws it only 0.2 past the poly. Place them 2L apart (li to li), so their RPMs merge.
 
 **Spacing:**
-- Resistors of the same kind may stand 2L apart, heads aligned.
+- Resistors of the same kind may stand 2L apart (li to li), heads aligned.
 - Other poly and diffusion need 0.48 from a body (poly.9, Magic only).
 
 ### MiM capacitor: mimcap
@@ -220,6 +232,34 @@ Starting in `mag/` is the simplest habit.
 
 **Extraction:** `C1 C2 … w=nw·L l=nl·L`, with w across and l up.
 
+### MiM capacitor on met4: mimcap2
+
+**Device:** `sky130_fd_pr__cap_mim_m3_2`. The same layout as mimcap, one metal up.
+
+**Geometry and pins:**
+- cap2m (Magic `mimcap2`) is nw·L × nl·L.
+- The bottom plate, met4 L past cap2m, is the terminal `C2`.
+- The top plate, met5 L inside cap2m, is `C1`, with via4 (0.8 at a 1.6 pitch) packed over it, 0.31 inside the met5 (m5.3).
+
+**Sizes:** set by the met5 plate, not by cap2m.1 (1.0):
+- nw, nl ≥ 11, for the plate's 1.6 width (m5.1);
+- (nw − 2)(nl − 2)·L² ≥ 4.0 µm², for its area (m5.4).
+
+So 14 × 14 is the smallest square and 11 × 16 the narrowest. The dialog corrects a smaller size by raising nl, with a message.
+
+**Capacitance:** the same per area as mimcap, 2.0 fF/µm² + 0.19 fF/µm. 14L × 14L ≈ 14.6 fF.
+
+**Spacing between caps:** plates 7L apart (cap2m.2b 1.2, cap2m.11).
+
+**Stacking on a mimcap:** place a mimcap and a mimcap2 of the same nw and nl at the same point.
+- The mimcap's met4 top plate and the mimcap2's met4 bottom plate merge into one node.
+- That gives `cap_mim_m3_1` from met3 to met4 and `cap_mim_m3_2` from met4 to met5.
+- The via4 contact area lies inside the via3 area below it, as Magic's cap2m.8 check ("must not cross") requires. Different sizes or offsets can break this.
+- Checked 2026-11-13 at 14 × 14, 11 × 16 and 30 × 12: Magic and KLayout DRC 0, and extraction gives both caps.
+- Connect met3 and met5 for the two caps in parallel; met4 is the common plate.
+
+**Extraction:** `C1 C2 sky130_fd_pr__cap_mim_m3_2 w=nw·L l=nl·L`.
+
 ### Guard rings (1.8 V)
 
 **Geometry:**
@@ -232,16 +272,19 @@ Starting in `mag/` is the simplest habit.
 
 **Voltage:** 1.8 V only, using `psd`/`psc` and `nsd`/`nsc`, not the 5 V types.
 
-### Contacts: polycont, mcon, via1
+### Contacts: polycont, ndiffc/pdiffc, psubdiffc/nsubdiffc, mcon, via1
 
-All three: the box is the outer edge, at least 2L × 2L, flat paint, no label.
+All of them: the box is the outer edge, at least 2L × 2L (2L × 3L for the tap contacts), flat paint, no label.
 
-| | polycont | mcon (li–met1) | via1 (met1–met2) |
-|---|---|---|---|
-| Metals | poly + li1, flush | li1 + met1, flush | met1 + met2, flush |
-| Cut | licon 0.17, 0.34 pitch | mcon 0.17, 0.36 pitch | via 0.15, 0.32 pitch |
-| Cuts inset from the box | (2L − 0.17)/2 = 0.095 | L/2 = 0.09 | 0.085 |
-| Cuts in 2L × 2L / 10L × 3L / 6L × 6L | 1 / 5 / 3 × 3 | 1 / 5 / 3 × 3 | 1 / 5 / 3 × 3 |
+| | polycont | ndiffc / pdiffc | mcon (li–met1) | via1 (met1–met2) |
+|---|---|---|---|---|
+| Metals | poly + li1, flush | ndiff / pdiff + li1, flush | li1 + met1, flush | met1 + met2, flush |
+| Cut | licon 0.17, 0.34 pitch | licon 0.17, 0.34 pitch | mcon 0.17, 0.36 pitch | via 0.15, 0.32 pitch |
+| Cuts inset from the box | (2L − 0.17)/2 = 0.095 | 0.095 | L/2 = 0.09 | 0.085 |
+| Cuts in 2L × 2L / 10L × 3L / 6L × 6L | 1 / 5 / 3 × 3 | the same as polycont | 1 / 5 / 3 × 3 | 1 / 5 / 3 × 3 |
+
+- **ndiffc / pdiffc** paint no well, and Magic generates the implant. A pdiffc must sit in an n-well, at least L inside it (diff/tap.8). A lone one gives LU.2 / LU.3 in Magic until a tap is near, like any diffusion.
+- **psubdiffc / nsubdiffc** (p-tap and n-tap, Magic `psd`/`psc`, `nsd`/`nsc`) are the same on tap, with the same cuts. They need **2L × 3L**, either way round: a tap must enclose its licon by 0.12 in one direction (licon.7), and 2L gives only 0.095. No well is painted: an nsubdiffc must sit in an n-well, at least L inside it (diff/tap.10).
 
 - Magic measures enclosure from the contact *type*, not the cut. That's why the contact areas are inset rather than flush with the box.
 - **via2 and via3 are not in the menu.** A centred 0.2 cut in 2L × 2L misses via2.4a / via3.5 by 0.005 / 0.01; 2L × 3L would work. Until they exist, use the PDK's Devices 1 vias, which put the metal off the L grid.
@@ -250,11 +293,12 @@ All three: the box is the outer edge, at least 2L × 2L, flat paint, no label.
 
 - **Names say what the cell is:** `nmos_n6_f2_l180_tl_tr_gb` is n = 6, 2 fingers, length 180 nm, left and right taps, bottom gate bar. The tokens, in order:
   - MOS: `n`, `f`, and `l` in nm;
-  - resistors and MiM cap: `w`, `l` in L;
+  - resistors: `w` in µm (`w0p69` is 0.69), `l` in L;
+  - MiM cap: `w`, `l` in L;
   - `lvt`/`hvt` only when vt isn't std;
   - flags only when set: `bt` butted, `tl`/`tr` taps, `gt`/`gb` gate bars.
 
-  Examples: `ppolyres_w5_l10`, `mimcap_w6_l8`.
+  Examples: `ppolyres_w0p69_l10`, `mimcap_w6_l8`.
 - **Why not Magic's names?** Magic names gencells `<type>_<6-character hash>`, and that hash collides: different parameters can get the same name. Magic then silently reuses the wrong cell. efx's names can't collide. PDK gencells keep the hash names.
 - **A gencell's `.mag` file is the only record of its parameters** (`string parameters …`). The parent's `use` line holds only the cell name and placement. Never delete a gencell file a design uses. Move unused ones aside (e.g. into `unused/`), checking every top cell's `use` lines first.
 - **The geometry is saved in the file.** A gencell saved before an `efx.tcl` change keeps its old geometry until you change its parameters.
@@ -281,7 +325,7 @@ All three: the box is the outer edge, at least 2L × 2L, flat paint, no label.
 | Name | — | |
 | Size | L | text height, used with a named font |
 | Port index | blank | blank reuses the number of a port with the same name, or takes the next free one |
-| Attach to layer | m1 | "default" lets Magic pick the type under the box |
+| Attach to layer | m1 | li, m1 … m5, nwell, pwell; "default" lets Magic pick the type under the box |
 | sticky | off | keeps the label on that layer when the paint under it changes |
 | Font | FreeSans | "default" is Magic's unscaled text |
 | Justification | center | |
@@ -303,7 +347,8 @@ All three: the box is the outer edge, at least 2L × 2L, flat paint, no label.
 - **Class and use** go only to the `.mag` file and LEF (`DIRECTION`, `USE`). Set `power` / `ground` on supplies if the cell may become a macro.
 - **A pin connects only to paint in its own cell.** A top-cell label sitting on a gencell's li (e.g. a gate bar) extracts as a disconnected node. Put some of the top cell's own paint under it, e.g. `findlabel inp; paint li`, or the route that feeds it.
 - **Put pins on plain metal, not on a contact.** Magic attaches a label to the type under it, which on `viali`, `via1` or `pc` is the contact.
-- **What the dialog refuses:** a box that already holds a label (Magic's `port make` needs exactly one), and a port number already used by another name. It warns about a pin with no paint under it.
+- **What the dialog refuses:** a box that already holds a label (Magic's `port make` needs exactly one), and a port number already used by another name. It warns about a pin with no paint under it, or (for a chosen layer) none of that layer under it, which a sticky label would otherwise hide.
+- **Well pins (VPB / VNB)** in a cell with no taps of its own: put VPB on `nwell` and VNB on `pwell` (paint `pwell` over the nmos area for it to sit on). The well is the body node, so the label names it and makes it a port; Magic counts `pwell` as substrate, so without a VNB label the nfets' body extracts as `VSUBS`. The tap cell beside it connects them. Checked 2026-11-06: a pfet's body extracts as `VPB`, a special nfet's as `VNB`.
 
 ## 9. Checking: DRC, extraction, LVS
 
@@ -359,7 +404,7 @@ The netlists, `.ext` files and report are ignored by git (`*.spice`, `*.ext`, `*
 
 **Expected messages:**
 - An nmos with no p-tap within 15 µm gives LU.2 in Magic.
-- A lone 4L resistor fails rpm.1a / urpm.1a in KLayout.
+- A lone resistor narrower than 0.87 µm fails rpm.1a / urpm.1a in KLayout.
 
 ## 10. Not covered yet
 

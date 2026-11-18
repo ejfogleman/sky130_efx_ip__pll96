@@ -1,0 +1,177 @@
+magic
+tech sky130A
+timestamp 1794679347
+<< error_s >>
+rect 1252 7730 1314 9108
+rect 18 7668 1314 7730
+rect 1404 7730 1466 9108
+rect 2638 7730 2700 9108
+rect 1404 7668 2700 7730
+rect 2790 7730 2852 9108
+rect 4024 7730 4086 9108
+rect 2790 7668 4086 7730
+rect 4176 7730 4238 9108
+rect 4176 7668 5472 7730
+rect 18 7516 1314 7578
+rect 1252 6200 1314 7516
+rect 18 6138 1314 6200
+rect 1404 7516 2700 7578
+rect 1404 6200 1466 7516
+rect 2638 6200 2700 7516
+rect 1404 6138 2700 6200
+rect 2790 7516 4086 7578
+rect 2790 6200 2852 7516
+rect 4024 6200 4086 7516
+rect 2790 6138 4086 6200
+rect 4176 7516 5472 7578
+rect 4176 6200 4238 7516
+rect 4176 6138 5472 6200
+rect 18 5986 1314 6048
+rect 1252 4670 1314 5986
+rect 18 4608 1314 4670
+rect 1404 5986 2700 6048
+rect 1404 4670 1466 5986
+rect 2638 4670 2700 5986
+rect 1404 4608 2700 4670
+rect 2790 5986 4086 6048
+rect 2790 4670 2852 5986
+rect 4024 4670 4086 5986
+rect 2790 4608 4086 4670
+rect 4176 5986 5472 6048
+rect 4176 4670 4238 5986
+rect 4176 4608 5472 4670
+rect 18 4456 1314 4518
+rect 1252 3140 1314 4456
+rect 18 3078 1314 3140
+rect 1404 4456 2700 4518
+rect 1404 3140 1466 4456
+rect 2638 3140 2700 4456
+rect 1404 3078 2700 3140
+rect 2790 4456 4086 4518
+rect 2790 3140 2852 4456
+rect 4024 3140 4086 4456
+rect 2790 3078 4086 3140
+rect 4176 4456 5472 4518
+rect 4176 3140 4238 4456
+rect 4176 3078 5472 3140
+rect 18 2926 1314 2988
+rect 1252 1610 1314 2926
+rect 18 1548 1314 1610
+rect 1404 2926 2700 2988
+rect 1404 1610 1466 2926
+rect 2638 1610 2700 2926
+rect 1404 1548 2700 1610
+rect 2790 2926 4086 2988
+rect 2790 1610 2852 2926
+rect 4024 1610 4086 2926
+rect 2790 1548 4086 1610
+rect 4176 2926 5472 2988
+rect 4176 1610 4238 2926
+rect 4176 1548 5472 1610
+rect 18 1396 1314 1458
+rect 1252 18 1314 1396
+rect 1404 1396 2700 1458
+rect 1404 18 1466 1396
+rect 2638 18 2700 1396
+rect 2790 1396 4086 1458
+rect 2790 18 2852 1396
+rect 4024 18 4086 1396
+rect 4176 1396 5472 1458
+rect 4176 18 4238 1396
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_0
+timestamp 1794679347
+transform 1 0 18 0 1 36
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_1
+timestamp 1794679347
+transform 1 0 1404 0 1 36
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_2
+timestamp 1794679347
+transform 1 0 18 0 1 1566
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_3
+timestamp 1794679347
+transform 1 0 18 0 1 3096
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_4
+timestamp 1794679347
+transform 1 0 18 0 1 4626
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_5
+timestamp 1794679347
+transform 1 0 18 0 1 6156
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_6
+timestamp 1794679347
+transform 1 0 1404 0 1 1566
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_7
+timestamp 1794679347
+transform 1 0 1404 0 1 3096
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_8
+timestamp 1794679347
+transform 1 0 1404 0 1 4626
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_9
+timestamp 1794679347
+transform 1 0 1404 0 1 6156
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_10
+timestamp 1794679347
+transform 1 0 2790 0 1 36
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_11
+timestamp 1794679347
+transform 1 0 2790 0 1 1566
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_12
+timestamp 1794679347
+transform 1 0 2790 0 1 3096
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_13
+timestamp 1794679347
+transform 1 0 2790 0 1 4626
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_14
+timestamp 1794679347
+transform 1 0 2790 0 1 6156
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_15
+timestamp 1794679347
+transform 1 0 4176 0 1 36
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_16
+timestamp 1794679347
+transform 1 0 4176 0 1 1566
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_17
+timestamp 1794679347
+transform 1 0 4176 0 1 3096
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_18
+timestamp 1794679347
+transform 1 0 4176 0 1 4626
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_19
+timestamp 1794679347
+transform 1 0 4176 0 1 6156
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_20
+timestamp 1794679347
+transform 1 0 4176 0 1 7686
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_21
+timestamp 1794679347
+transform 1 0 2790 0 1 7686
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_22
+timestamp 1794679347
+transform 1 0 1404 0 1 7686
+box -18 -36 1314 1440
+use efx_pll96_lpf_unit  efx_pll96_lpf_unit_23
+timestamp 1794679347
+transform 1 0 18 0 1 7686
+box -18 -36 1314 1440
+<< end >>

@@ -1,5 +1,4 @@
-v {xschem version=3.4.5 file_version=1.2
-}
+v {xschem version=3.4.7 file_version=1.2}
 G {}
 K {}
 V {}
@@ -74,11 +73,11 @@ C {iopin.sym} 60 -530 0 1 {name=p11 lab=vdd}
 C {iopin.sym} 60 -120 0 1 {name=p12 lab=gnd}
 C {title_efx.sym} 200 -40 0 0 {name=l1 author="ejfogleman"}
 C {sky130_fd_pr/pfet3_01v8_hvt.sym} 390 -480 0 0 {name=M5
-W=2
+W=1.08
 L=0.15
 body=vdd
 nf=1
-mult=1
+mult=2
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -89,11 +88,11 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet3_01v8.sym} 160 -200 0 0 {name=M1
-W=2
+W=0.54
 L=0.15
 body=gnd
 nf=1
-mult=1
+mult=4
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -104,11 +103,11 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet3_01v8.sym} 430 -200 0 1 {name=M2
-W=2
+W=0.54
 L=0.15
 body=gnd
 nf=1
-mult=1
+mult=4
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -119,11 +118,11 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet3_01v8_hvt.sym} 200 -480 0 1 {name=M3
-W=2
+W=1.08
 L=0.15
 body=vdd
 nf=1
-mult=1
+mult=2
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -134,11 +133,11 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet3_01v8_hvt.sym} 160 -340 0 0 {name=M4
-W=2
+W=1.08
 L=0.15
 body=vdd
 nf=1
-mult=1
+mult=2
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -149,11 +148,11 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet3_01v8_hvt.sym} 430 -340 0 1 {name=M6
-W=2
+W=1.08
 L=0.15
 body=vdd
 nf=1
-mult=1
+mult=2
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -164,11 +163,11 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet3_01v8.sym} 870 -200 0 0 {name=M7
-W=2
+W=0.54
 L=0.15
 body=gnd
 nf=1
-mult=1
+mult=4
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -179,7 +178,7 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet3_01v8_hvt.sym} 870 -340 0 0 {name=M8
-W=4
+W=3.96
 L=0.15
 body=vdd
 nf=1
@@ -194,11 +193,11 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet3_01v8.sym} 700 -200 0 0 {name=M9
-W=2
+W=0.54
 L=0.15
 body=gnd
 nf=1
-mult=1
+mult=4
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -209,11 +208,11 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet3_01v8_hvt.sym} 700 -340 0 0 {name=M10
-W=4
+W=1.08
 L=0.15
 body=vdd
 nf=1
-mult=1
+mult=4
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 

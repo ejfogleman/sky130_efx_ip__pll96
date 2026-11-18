@@ -1,70 +1,31 @@
 magic
 tech sky130A
-magscale 1 2
-timestamp 1747181453
+timestamp 1794964782
 << locali >>
-rect 560 456 1226 490
-rect 560 324 656 456
-rect 814 324 972 456
-rect 1130 324 1226 456
-rect 560 290 1226 324
-rect 560 -930 1226 -896
-rect 560 -1062 656 -930
-rect 814 -1062 972 -930
-rect 1130 -1062 1226 -930
-rect 560 -1096 1226 -1062
-<< viali >>
-rect 656 324 814 456
-rect 972 324 1130 456
-rect 656 -1062 814 -930
-rect 972 -1062 1130 -930
-<< metal1 >>
-rect 560 456 1226 490
-rect 560 324 656 456
-rect 814 324 972 456
-rect 1130 324 1226 456
-rect 560 290 1226 324
-rect 662 160 714 290
-rect 979 160 1031 290
-rect 666 -580 718 -235
-rect 796 -328 848 -140
-rect 990 -328 1042 -231
-rect 795 -380 1042 -328
-rect 796 -666 848 -380
-rect 990 -576 1042 -380
-rect 1108 -666 1160 -140
-rect 662 -896 714 -766
-rect 978 -896 1030 -766
-rect 560 -930 1226 -896
-rect 560 -1062 656 -930
-rect 814 -1062 972 -930
-rect 1130 -1062 1226 -930
-rect 560 -1096 1226 -1062
-use sky130_fd_pr__nfet_01v8_D5KUY4  XMN2
-timestamp 1747152884
-transform 1 0 1051 0 1 -687
-box -211 -279 211 279
-use sky130_fd_pr__nfet_01v8_D5KUY4  XMN4
-timestamp 1747152884
-transform 1 0 735 0 1 -687
-box -211 -279 211 279
-use sky130_fd_pr__pfet_01v8_hvt_ZLV5H2  XMP1
-timestamp 1747152884
-transform 1 0 735 0 1 -24
-box -211 -384 211 384
-use sky130_fd_pr__pfet_01v8_hvt_ZLV5H2  XMP3
-timestamp 1747152884
-transform 1 0 1051 0 1 -24
-box -211 -384 211 384
+rect 90 126 198 162
+use sky130_efx_lvdig__inv_1  sky130_efx_lvdig__inv_1_0 ~/Projects/sky130_efx_ip__pll96/mag/../dependencies/sky130_efx_ip__lvdig/mag
+timestamp 1794021122
+transform 1 0 0 0 1 18
+box 0 -54 144 342
+use sky130_efx_lvdig__inv_1  sky130_efx_lvdig__inv_1_1
+timestamp 1794021122
+transform 1 0 144 0 1 18
+box 0 -54 144 342
+use sky130_efx_lvdig__tapvpwrvgnd_1  sky130_efx_lvdig__tapvpwrvgnd_1_0 ~/Projects/sky130_efx_ip__pll96/mag/../dependencies/sky130_efx_ip__lvdig/mag
+timestamp 1794067076
+transform 1 0 -72 0 1 18
+box -18 -54 90 342
 << labels >>
-flabel metal1 560 -1096 760 -896 0 FreeSans 256 0 0 0 gnd
-port 4 nsew
-flabel metal1 666 -434 718 -382 0 FreeSans 256 0 0 0 a
-port 1 nsew
-flabel metal1 560 290 760 490 0 FreeSans 256 0 0 0 vdd
-port 0 nsew
-flabel metal1 1108 -434 1160 -382 0 FreeSans 256 0 0 0 y
-port 2 nsew
-flabel metal1 796 -434 848 -382 0 FreeSans 256 0 0 0 y_b
-port 3 nsew
+flabel metal1 -72 288 0 360 0 FreeSans 144 0 0 0 vdd
+port 1 nsew power bidirectional
+flabel metal1 -72 -36 0 36 0 FreeSans 144 0 0 0 gnd
+port 2 nsew ground bidirectional
+flabel locali 18 126 54 162 0 FreeSans 144 0 0 0 a
+port 3 nsew signal input
+flabel locali 90 126 126 162 0 FreeSans 144 0 0 0 y_b
+port 4 nsew signal output
+flabel locali 234 126 252 162 0 FreeSans 144 0 0 0 y
+port 5 nsew signal output
+<< properties >>
+string FIXED_BBOX -72 0 288 324
 << end >>

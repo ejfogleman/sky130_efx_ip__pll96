@@ -1,0 +1,18 @@
+magic
+tech sky130A
+timestamp 1794679347
+use mimcap2_w72_l80  mimcap2_w72_l80_0
+timestamp 1794679347
+transform 1 0 648 0 1 -36
+box -666 0 666 1476
+use mimcap_w72_l80  mimcap_w72_l80_0
+timestamp 1794678262
+transform 1 0 648 0 1 -36
+box -666 0 666 1476
+use pmos_n74_f2_l5400_bt_tl_tr_lvt  pmos_n74_f2_l5400_bt_tl_tr_lvt_0
+timestamp 1794678262
+transform 1 0 72 0 1 54
+box -72 -18 1224 1350
+<< properties >>
+string FIXED_BBOX -18 -36 1314 1440
+<< end >>

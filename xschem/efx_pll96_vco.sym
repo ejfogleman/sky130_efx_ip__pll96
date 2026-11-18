@@ -1,5 +1,4 @@
-v {xschem version=3.4.5 file_version=1.2
-}
+v {xschem version=3.4.7 file_version=1.2}
 G {}
 K {type=subcircuit
 format="@name @pinlist @symname"
@@ -9,27 +8,29 @@ V {}
 S {}
 E {}
 L 4 -130 -50 130 -50 {}
-L 4 -130 90 130 90 {}
-L 4 -130 -50 -130 90 {}
-L 4 130 -50 130 90 {}
+L 4 -130 110 130 110 {}
+L 4 -130 -50 -130 110 {}
+L 4 130 -50 130 110 {}
 L 4 -150 0 -130 0 {}
 L 4 130 -10 150 -10 {}
 L 4 130 10 150 10 {}
 L 4 -150 60 -130 60 {}
 L 4 -150 40 -130 40 {}
 L 4 -150 20 -130 20 {}
+L 4 -150 80 -130 80 {}
 L 7 -150 -40 -130 -40 {}
 L 7 130 -40 150 -40 {}
-L 7 -150 80 -130 80 {}
+L 7 -150 100 -130 100 {}
 B 5 -152.5 -42.5 -147.5 -37.5 {name=vdd_vco dir=inout}
 B 5 -152.5 -2.5 -147.5 2.5 {name=vc dir=in}
 B 5 147.5 -42.5 152.5 -37.5 {name=vdd dir=inout}
 B 5 147.5 -12.5 152.5 -7.5 {name=outp dir=out}
 B 5 147.5 7.5 152.5 12.5 {name=outn dir=out}
-B 5 -152.5 77.5 -147.5 82.5 {name=gnd_vco dir=inout}
+B 5 -152.5 97.5 -147.5 102.5 {name=gnd_vco dir=inout}
 B 5 -152.5 57.5 -147.5 62.5 {name=tst[0] dir=in}
 B 5 -152.5 37.5 -147.5 42.5 {name=tst[1] dir=in}
 B 5 -152.5 17.5 -147.5 22.5 {name=tst[2] dir=in}
+B 5 -152.5 77.5 -147.5 82.5 {name=en dir=in}
 T {@symname} -49.5 -6 0 0 0.3 0.3 {}
 T {@name} 135 -62 0 0 0.2 0.2 {}
 T {vdd_vco} -125 -44 0 0 0.2 0.2 {}
@@ -37,9 +38,10 @@ T {vc} -125 -4 0 0 0.2 0.2 {}
 T {vdd} 125 -44 0 1 0.2 0.2 {}
 T {outp} 125 -14 0 1 0.2 0.2 {}
 T {outn} 125 6 0 1 0.2 0.2 {}
-T {gnd_vco} -125 76 0 0 0.2 0.2 {}
+T {gnd_vco} -125 96 0 0 0.2 0.2 {}
 T {tst[0]} -125 56 0 0 0.2 0.2 {}
 T {tst[1]} -125 36 0 0 0.2 0.2 {}
 T {tst[2]} -125 16 0 0 0.2 0.2 {}
 T { Copyright (c) 2025 Eric Fogleman
  SPDX-License-Identifier: Apache-2.0} 0 -40 0 0 0.1 0.1 {vcenter=TRUE hcenter=TRUE}
+T {en} -125 76 0 0 0.2 0.2 {}

@@ -53,7 +53,7 @@ N 1700 -540 1720 -540 {
 lab=vdd_div}
 N 1720 -620 1720 -540 {
 lab=vdd_div}
-N 1700 -490 1770 -490 {
+N 1700 -490 1810 -490 {
 lab=vco_outn}
 N 1790 -510 1790 -330 {
 lab=vco_outp}
@@ -101,9 +101,7 @@ N 1390 -660 1390 -540 {
 lab=vdd_vco}
 N 1360 -600 1370 -600 {
 lab=gnd_vco}
-N 1370 -420 1400 -420 {
-lab=gnd_vco}
-N 1370 -600 1370 -420 {
+N 1370 -600 1370 -400 {
 lab=gnd_vco}
 N 1360 -660 1390 -660 {
 lab=vdd_vco}
@@ -145,13 +143,13 @@ N 180 -260 700 -260 {
 lab=chp_b[0]}
 N 180 -280 680 -280 {
 lab=chp_b[1]}
-N 1350 -440 1400 -440 {
+N 1330 -440 1400 -440 {
 lab=vco_tst[0]}
-N 1350 -440 1350 -250 {
+N 1330 -440 1330 -250 {
 lab=vco_tst[0]}
-N 1290 -250 1350 -250 {
+N 1270 -250 1330 -250 {
 lab=vco_tst[0]}
-N 1290 -420 1370 -420 {
+N 1370 -400 1400 -400 {
 lab=gnd_vco}
 N 1290 -710 1390 -710 {
 lab=vdd_vco}
@@ -165,17 +163,17 @@ N 1130 -610 1130 -160 {
 lab=lpf_rsc[0]}
 N 180 -160 1130 -160 {
 lab=lpf_rsc[0]}
-N 1330 -460 1400 -460 {
+N 1310 -460 1400 -460 {
 lab=vco_tst[1]}
-N 1330 -460 1330 -270 {
+N 1310 -460 1310 -270 {
 lab=vco_tst[1]}
-N 1290 -270 1330 -270 {
+N 1270 -270 1310 -270 {
 lab=vco_tst[1]}
-N 1290 -290 1310 -290 {
+N 1270 -290 1290 -290 {
 lab=vco_tst[2]}
-N 1310 -480 1310 -290 {
+N 1290 -480 1290 -290 {
 lab=vco_tst[2]}
-N 1310 -480 1400 -480 {
+N 1290 -480 1400 -480 {
 lab=vco_tst[2]}
 N 1090 -650 1140 -650 {
 lab=lpf_csc}
@@ -222,7 +220,10 @@ N 1780 -290 2170 -290 {
 lab=gnd_div}
 N 1050 -480 1270 -480 {lab=vc2}
 N 1270 -570 1270 -480 {lab=vc2}
-N 1770 -490 1810 -490 {lab=vco_outn}
+N 1250 -400 1370 -400 {lab=gnd_vco}
+N 1350 -420 1400 -420 {lab=vco_tst[0]}
+N 1350 -420 1350 -230 {lab=vco_tst[0]}
+N 1270 -230 1350 -230 {lab=vco_tst[0]}
 C {title_efx.sym} 200 -40 0 0 {name=l1 author="ejfogleman"}
 C {efx_pll96_lpf.sym} 1250 -630 0 0 {name=xlpf}
 C {efx_pll96_pfd.sym} 480 -500 0 0 {name=xpfd}
@@ -252,7 +253,7 @@ C {lab_wire.sym} 2190 -380 0 1 {name=p7 sig_type=std_logic lab=clk_divf
 }
 C {opin.sym} 2230 -560 0 0 {name=p28 lab=clk_out}
 C {opin.sym} 2230 -540 0 0 {name=p29 lab=clk_out_div2}
-C {iopin.sym} 1290 -420 0 1 {name=p32 lab=gnd_vco}
+C {iopin.sym} 1270 -400 0 1 {name=p32 lab=gnd_vco}
 C {iopin.sym} 1780 -290 0 1 {name=p33 lab=gnd_div}
 C {efx_pll96_div_r.sym} 100 -510 0 0 {name=xdivr}
 C {lab_wire.sym} 310 -510 0 0 {name=p34 sig_type=std_logic lab=clk_ref}
@@ -261,10 +262,10 @@ C {ipin.sym} -90 -480 0 0 {name=p37 lab=divr_en}
 C {ipin.sym} 180 -200 0 0 {name=p39 lab=lpf_csc}
 C {ipin.sym} 180 -280 0 0 {name=p40 lab=chp_b[1]}
 C {ipin.sym} 180 -220 0 0 {name=p30 lab=chp_en}
-C {ipin.sym} 1290 -250 0 0 {name=p43 lab=vco_tst[0]}
+C {ipin.sym} 1270 -250 0 0 {name=p43 lab=vco_tst[0]}
 C {ipin.sym} 180 -160 0 0 {name=p41 lab=lpf_rsc[0]}
-C {ipin.sym} 1290 -270 0 0 {name=p36 lab=vco_tst[1]}
-C {ipin.sym} 1290 -290 0 0 {name=p38 lab=vco_tst[2]}
+C {ipin.sym} 1270 -270 0 0 {name=p36 lab=vco_tst[1]}
+C {ipin.sym} 1270 -290 0 0 {name=p38 lab=vco_tst[2]}
 C {ipin.sym} 180 -180 0 0 {name=p42 lab=lpf_rsc[1]}
 C {ipin.sym} -90 -520 0 0 {name=p44 lab=divr_r[0]}
 C {ipin.sym} 180 -300 0 0 {name=p45 lab=chp_b[2]}
@@ -274,3 +275,4 @@ C {copyright.sym} 0 10 0 0 {name=s1 place=header value="* Copyright (c) Eric Fog
 C {efx_pll96_div_f.sym} 2000 -380 0 0 {name=x1}
 C {lab_wire.sym} 1230 -480 0 0 {name=p15 sig_type=std_logic lab=vc2}
 C {noconn.sym} 1810 -490 0 1 {name=l2}
+C {ipin.sym} 1270 -230 0 0 {name=p16 lab=vco_en}

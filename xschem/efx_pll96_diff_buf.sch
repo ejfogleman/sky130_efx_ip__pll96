@@ -153,7 +153,7 @@ C {iopin.sym} 0 -220 0 1 {name=p2 lab=gnd}
 C {ipin.sym} -10 -650 0 0 {name=p3 lab=a}
 C {opin.sym} 770 -650 0 0 {name=p4 lab=y_b}
 C {sky130_fd_pr/nfet_01v8.sym} 180 -580 0 0 {name=MN1
-W=0.74
+W=0.72
 L=0.15
 nf=1
 mult=1
@@ -167,7 +167,7 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8_hvt.sym} 180 -720 0 0 {name=MP1
-W=2.58
+W=2.52
 L=0.15
 nf=1
 mult=1
@@ -181,7 +181,7 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet_01v8.sym} 640 -580 0 0 {name=MN11
-W=0.74
+W=0.72
 L=0.15
 nf=1
 mult=1
@@ -195,7 +195,7 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8_hvt.sym} 640 -720 0 0 {name=MP11
-W=2.58
+W=2.52
 L=0.15
 nf=1
 mult=1
@@ -209,7 +209,7 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet_01v8.sym} 410 -580 0 0 {name=MN10
-W=0.74
+W=0.72
 L=0.15
 nf=1
 mult=1
@@ -223,7 +223,7 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8_hvt.sym} 410 -720 0 0 {name=MP10
-W=2.58
+W=2.52
 L=0.15
 nf=1
 mult=1
@@ -238,7 +238,7 @@ spiceprefix=X
 }
 C {opin.sym} 770 -350 0 0 {name=p6 lab=y}
 C {sky130_fd_pr/nfet_01v8.sym} 640 -280 0 0 {name=MN21
-W=0.74
+W=0.72
 L=0.15
 nf=1
 mult=1
@@ -252,7 +252,7 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8_hvt.sym} 640 -420 0 0 {name=MP21
-W=2.58
+W=2.52
 L=0.15
 nf=1
 mult=1
@@ -266,7 +266,7 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet3_01v8_hvt.sym} 430 -260 3 0 {name=MP20
-W=2.58
+W=2.52
 L=0.15
 body=vdd
 nf=1
@@ -281,7 +281,7 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/nfet3_01v8.sym} 450 -440 1 0 {name=MN20
-W=0.74
+W=0.72
 L=0.15
 body=gnd
 nf=1
@@ -299,7 +299,7 @@ C {opin.sym} 780 -190 0 0 {name=p5 lab=a_b}
 C {copyright.sym} 0 10 0 0 {name=s1 place=header value="* Copyright (c) Eric Fogleman 2025 
 * SPDX-License-Identifier: Apache-2.0"}
 C {sky130_fd_pr/nfet_01v8.sym} 80 -280 0 0 {name=MN40
-W=0.74
+W=0.72
 L=0.15
 nf=1
 mult=1
@@ -313,7 +313,7 @@ model=nfet_01v8
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8_hvt.sym} 80 -420 0 0 {name=MP40
-W=0.63
+W=0.72
 L=0.15
 nf=1
 mult=1
@@ -327,7 +327,7 @@ model=pfet_01v8_hvt
 spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8_hvt.sym} 210 -420 0 0 {name=MP41
-W=0.64
+W=0.72
 L=0.15
 nf=1
 mult=1

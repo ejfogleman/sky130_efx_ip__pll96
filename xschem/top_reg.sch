@@ -20,6 +20,7 @@ C {devices/code_shown.sym} 10 90 0 0 {name=s1 only_toplevel=false value="*** efx
 .param IB=1u
 .param VDIVR_EN=1.8
 .param VCHP_EN=1.8
+.param VVCO_EN=1.8
 .param VTST0=0
 .param VTST1=0
 .param VTST2=0

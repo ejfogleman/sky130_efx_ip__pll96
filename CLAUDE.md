@@ -25,6 +25,7 @@ The repo follows `~/Projects/sky130_efx_ip__template` (same `Makefile` except th
 make sim                              # netlist every xschem/tb_*.sch into sim/
 make sim/tb_efx_pll96_top_reg.spice   # one testbench
 make lvs CELL=efx_pll96_dbuf          # xschem + magic netlists, then netgen; fails on mismatch
+make pex CELL=efx_pll96_vco_dlycell   # LVS, then lvs/pex_c/<cell>.spice (PEX=none|c|rc), ports in schematic order
 make clean-lvs
 make check                            # re-run both checks on sim/tb_*.spice
 make clean                            # clean-lvs + failed netlists (sim/*.spice.bad); keeps sim results

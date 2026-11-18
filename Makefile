@@ -4,7 +4,10 @@
 #   make sim                netlist every xschem/tb_*.sch into sim/ (ngspice)
 #   make sim/tb_foo.spice   one testbench
 #   make lvs CELL=foo       netlists of foo from xschem and Magic, then Netgen
-#   make clean-lvs          remove generated LVS files (keeps the folders)
+#   make pex CELL=foo       LVS, then layout-extracted netlist lvs/pex_<PEX>/foo.spice
+#                           (PEX=c default: parasitic C; none: devices; rc: R and C),
+#                           ports in the schematic's order
+#   make clean-lvs          remove generated LVS and PEX files (keeps the folders)
 #   make check              re-run the schematic and netlist checks on sim/tb_*.spice
 #   make clean              clean-lvs, plus failed netlists (sim/*.spice.bad/.err);
 #                           keeps the tracked netlists and simulation results
@@ -26,7 +29,7 @@ SCH_FILES := $(wildcard xschem/*.sch xschem/*.sym dependencies/*/xschem/*.sch de
 MAG_FILES := $(wildcard mag/*.mag dependencies/*/mag/*.mag)
 TESTBENCHES := $(patsubst xschem/%.sch,sim/%.spice,$(wildcard xschem/tb_*.sch))
 
-.PHONY: sim lvs clean-lvs check clean help
+.PHONY: sim lvs pex clean-lvs check clean help
 
 # Keep the netlists: make would otherwise delete them as intermediate files
 # of the lvs/%.out chain once the report is written
@@ -114,8 +117,56 @@ lvs: lvs/$(CELL).out
 	 else echo "LVS $(CELL): MISMATCH, see $<"; grep "Final result" $<; exit 1; fi
 endif
 
+# Parasitic extraction (as lvdig's lvs/pex_<mode> flow), for simulating a cell
+# from its layout: PEX=none devices only, PEX=c (default) parasitic C, PEX=rc
+# parasitic R and C (Magic extresist). The cell is flattened into an unsaved
+# <cell>_flat and extracted in lvs/pex_<mode>/ (Magic starts in mag/ to read
+# .magicrc, then cd's there). Flat, so every device gets its own source/drain
+# area; extresist also needs a flat cell it can find by name, and reads the
+# .ext/.sim files from the working directory. scripts/pex_ports.py then renames
+# the .subckt back to <cell> and puts its ports in the schematic's order (Magic
+# orders them by the labels' port numbers, xschem by the symbol's pins).
+# `make pex` runs LVS first and stops on a mismatch.
+PEX ?= c
+ifeq ($(filter $(PEX),none c rc),)
+$(error PEX must be none, c or rc, not '$(PEX)')
+endif
+PEX_HEAD = 'load $*' 'flatten $*_flat' 'load $*_flat' 'select top cell' \
+  'cd $(CURDIR)/$(@D)' 'extract all'
+PEX_OUT  = 'ext2spice lvs' 'ext2spice hierarchy off' 'ext2spice subcircuit top on'
+PEX_END  = 'ext2spice -o $(CURDIR)/$(@D)/$*.raw.spice' 'quit -noprompt'
+PEX_PORTS = python3 scripts/pex_ports.py $(@D)/$*.raw.spice lvs/schematic/$*.spice $@
+
+lvs/pex_none/%.spice: mag/%.mag $(MAG_FILES) lvs/schematic/%.spice scripts/pex_ports.py
+	@mkdir -p $(@D)
+	cd mag && printf '%s\n' $(PEX_HEAD) $(PEX_OUT) $(PEX_END) | $(MAGIC) >/dev/null
+	$(PEX_PORTS) none
+
+lvs/pex_c/%.spice: mag/%.mag $(MAG_FILES) lvs/schematic/%.spice scripts/pex_ports.py
+	@mkdir -p $(@D)
+	cd mag && printf '%s\n' $(PEX_HEAD) $(PEX_OUT) 'ext2spice cthresh 0' $(PEX_END) \
+	  | $(MAGIC) >/dev/null
+	$(PEX_PORTS) c
+
+lvs/pex_rc/%.spice: mag/%.mag $(MAG_FILES) lvs/schematic/%.spice scripts/pex_ports.py
+	@mkdir -p $(@D)
+	cd mag && printf '%s\n' $(PEX_HEAD) 'ext2sim labels on' 'ext2sim' \
+	  'extresist tolerance 10' 'extresist cell $*_flat' 'extresist all' \
+	  $(PEX_OUT) 'ext2spice cthresh 0' 'ext2spice extresist on' $(PEX_END) \
+	  | $(MAGIC) >/dev/null
+	$(PEX_PORTS) rc
+
+ifeq ($(CELL),)
+pex:
+	@echo "usage: make pex CELL=<cell> [PEX=none|c|rc]"; exit 2
+else
+pex: lvs
+	@$(MAKE) --no-print-directory lvs/pex_$(PEX)/$(CELL).spice
+endif
+
 clean-lvs:
-	rm -f lvs/*.out lvs/schematic/*.spice lvs/layout/*.spice lvs/layout/*.ext
+	rm -f lvs/*.out lvs/schematic/*.spice lvs/layout/*.spice lvs/layout/*.ext \
+	  lvs/pex_*/*.spice lvs/pex_*/*.ext lvs/pex_*/*.sim lvs/pex_*/*.nodes
 
 clean: clean-lvs
 	rm -f sim/*.spice.bad sim/*.spice.err

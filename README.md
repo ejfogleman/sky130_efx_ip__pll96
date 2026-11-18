@@ -23,7 +23,7 @@ The signal path, left to right in the schematic above:
 * **Phase-frequency detector (`pfd`)** compares the divided reference with the feedback clock and produces complementary up/down pulses.
 * **Charge pump (`chp`)** converts the PFD pulses into current on the control node `vc`. The pump current is set from the bias input and programmed with `chp_b[2:0]`. A replica branch, referenced to the filter's sense-only node `vc2`, keeps the up and down currents matched. `chp_en` disables the pump.
 * **Loop filter (`lpf`)** is a second-order passive filter whose capacitors (`lpf_csc`) and resistor (`lpf_rsc[1:0]`) scale with the reference frequency to keep loop bandwidth and damping roughly constant across modes.
-* **VCO (`vco`)** is a differential ring oscillator with PMOS control, running from its own `vdd_vco` supply, with a level shifter into the divider domain. Control word `vco_tst[2:0]` forces `vc` to fixed levels for open-loop VCO characterization (normal operation is `000` and disable is `100`).
+* **VCO (`vco`)** is a differential ring oscillator with PMOS control, running from its own `vdd_vco` supply, with a level shifter into the divider domain. `vco_en` low disables the VCO by pulling `vc` to `vdd_vco`. Control word `vco_tst[2:0]` forces `vc` to fixed levels for open-loop VCO characterization (normal operation is `000`).
 * **Feedback divider (`div_f`)** is a 5-bit synchronous down-counter clocked by the VCO, dividing by N = 2–32 (`divf_c[4:0]` = N − 1).
 * **Output buffer (`outbuf`)** drives `clk_out` at the VCO frequency and `clk_out_div2` at half the VCO frequency.
 
@@ -67,6 +67,7 @@ The reference, VCO and divider circuits use separate supply/ground pairs (`vdd_r
 | chp_b[2:0] | i | charge pump bias |
 | lpf_csc | i | filter cap scale |
 | lpf_rsc[1:0] | i | filter resistor scale |
+| vco_en | i | vco enable (assert high to enable vco) |
 | vco_tst[2:0] | i | vco test modes (default low) |
 | divf_c[4:0] | i | feedback divider count, N-1 (N = 2--32) |
 | clk_out | o | clock output at vco frequency (96 MHz) |
@@ -82,7 +83,7 @@ Connections on the Chipalooza harness chip, within the resources each project ma
 | 3.3-V analog supply | yes | 0 | not used |
 | Bandgap-referenced bias voltage | 1 | 0 | not used |
 | Bandgap-referenced current sources | 2 | 1 | `ibnp_1u`: 1 uA, sunk by the harness source (NMOS output) from the PMOS diode in the charge pump |
-| Digital controls (inputs) | 24 | 20 | `clk`, `divr_en`, `divr_r[1:0]`, `chp_en`, `chp_b[2:0]`, `lpf_csc`, `lpf_rsc[1:0]`, `vco_tst[2:0]`, `divf_c[4:0]`, and `clk_sel` for the output multiplexer |
+| Digital controls (inputs) | 24 | 21 | `clk`, `divr_en`, `divr_r[1:0]`, `chp_en`, `chp_b[2:0]`, `lpf_csc`, `lpf_rsc[1:0]`, `vco_en`, `vco_tst[2:0]`, `divf_c[4:0]`, and `clk_sel` for the output multiplexer |
 | Digital test signals (outputs) | 12 | 0 | not used |
 | Shared analog lines | 4 | 0 | not used |
 | Dedicated pins | 3 | 3 | 1.8-V supply pad for `vdd_ref`; 1.8-V supply pad for `vdd_vco`; one digital I/O pad for `clk_out` or `clk_out_div2`, chosen by a multiplexer |
@@ -92,43 +93,44 @@ Connections on the Chipalooza harness chip, within the resources each project ma
 
 # Test Ports
 
-These inputs support bring-up and open-loop characterization. In normal operation `chp_en` and `divr_en` are high and `vco_tst[2:0]` is `000`.
+These inputs support bring-up and open-loop characterization. In normal operation `chp_en`, `divr_en` and `vco_en` are high and `vco_tst[2:0]` is `000`.
 
 | Pin | Normal | Test use |
 | --- | --- | --- |
 | chp_en | 1 | 0 disables the charge pump, leaving `vc` to the loop filter or to `vco_tst` |
 | divr_en | 1 | 0 gates the reference clock off |
-| vco_tst[2:0] | 000 | forces the VCO control voltage `vc` to a fixed level (use with `chp_en` = 0); see below |
+| vco_en | 1 | 0 stops the VCO (pulls `vc` to `vdd_vco`; use with `vco_tst` = `000`) |
+| vco_tst[2:0] | 000 | forces the VCO control voltage `vc` to a fixed level (use with `chp_en` = 0 and `vco_en` = 1); see below |
 
 `vco_tst[2:0]` settings (the VCO control is PMOS, so a lower `vc` gives a higher frequency):
 
 | vco_tst[2:0] | vc |
 | --- | --- |
 | 000 | normal operation (closed loop) |
-| 100 | 1.8 V (VCO disabled) |
+| 100 | 1.8 V (VCO stopped) |
 | 101 | 0.9 V (3/6 VDD) |
 | 001 | 0.771 V (3/7 VDD) |
 | 11x | 0.72 V (2/5 VDD) |
 | 011 | 0.6 V (2/6 VDD) |
 | 010 | 0 V |
 
-With the loop open, stepping `vc` through these levels and measuring `clk_out` gives the VCO tuning curve, and `clk_out_div2` gives the same at half frequency. The fixed levels come from a resistor divider that draws extra current from `vdd_vco` (about 34 uA, test only) while selected. `100` stops the VCO.
+With the loop open, stepping `vc` through these levels and measuring `clk_out` gives the VCO tuning curve, and `clk_out_div2` gives the same at half frequency. The fixed levels come from a resistor divider that draws extra current from `vdd_vco` (about 34 uA, test only) while selected. `100` stops the VCO, but `vco_en` = 0 is the disable; it needs no test code.
 
 
 # Programming
 
-| F_ref | F_out | N | divr | divf_c[4:0] | lpf_csc | lpf_rsc[1:0] | chp_b[2:0] | divr_en | chp_en | vco_tst[2:0] |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| *off* | *off* | xx | x | xxxxx | x | xx | xxx | 0 | 0 | 100 |
-| 4M | 96M | 24 | 00 | 10111 | 1 | 00 | 101 | 1 | 1 | 000 |
-| 5M | 100M | 20 | 00 | 10011 | 1 | 00 | 101 | 1 | 1 | 000 |
-| 5M | 100M | 20 | 00 | 10011 | 1 | 01 | 100 | 1 | 1 | 000 |
-| 6M | 96M | 16 | 00 | 01111 | 1 | 01 | 100 | 1 | 1 | 000 |
-| 8M | 96M | 12 | 00 | 01011 | 0 | 00 | 101 | 1 | 1 | 000 |
-| 10M | 100M | 10 | 00 | 01001 | 0 | 00 | 101 | 1 | 1 | 000 |
-| 10M | 100M | 10 | 00 | 01001 | 0 | 01 | 100 | 1 | 1 | 000 |
-| 12M | 96M | 8 | 00 | 00111 | 0 | 01 | 100 | 1 | 1 | 000 |
-| 16M | 96M | 6 | 00 | 00101 | 0 | 11 | 010 | 1 | 1 | 000 |
+| F_ref | F_out | N | divr | divf_c[4:0] | lpf_csc | lpf_rsc[1:0] | chp_b[2:0] | divr_en | chp_en | vco_en | vco_tst[2:0] |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| *off* | *off* | xx | x | xxxxx | x | xx | xxx | 0 | 0 | 0 | 000 |
+| 4M | 96M | 24 | 00 | 10111 | 1 | 00 | 101 | 1 | 1 | 1 | 000 |
+| 5M | 100M | 20 | 00 | 10011 | 1 | 00 | 101 | 1 | 1 | 1 | 000 |
+| 5M | 100M | 20 | 00 | 10011 | 1 | 01 | 100 | 1 | 1 | 1 | 000 |
+| 6M | 96M | 16 | 00 | 01111 | 1 | 01 | 100 | 1 | 1 | 1 | 000 |
+| 8M | 96M | 12 | 00 | 01011 | 0 | 00 | 101 | 1 | 1 | 1 | 000 |
+| 10M | 100M | 10 | 00 | 01001 | 0 | 00 | 101 | 1 | 1 | 1 | 000 |
+| 10M | 100M | 10 | 00 | 01001 | 0 | 01 | 100 | 1 | 1 | 1 | 000 |
+| 12M | 96M | 8 | 00 | 00111 | 0 | 01 | 100 | 1 | 1 | 1 | 000 |
+| 16M | 96M | 6 | 00 | 00101 | 0 | 11 | 010 | 1 | 1 | 1 | 000 |
 
 
 # Test Plan

@@ -1,5 +1,4 @@
-v {xschem version=3.4.5 file_version=1.2
-}
+v {xschem version=3.4.7 file_version=1.2}
 G {}
 K {}
 V {}
@@ -11,7 +10,7 @@ vc = 0.9 V ==> 70.8 MHz (tst_mid)
 vc = 0.6 V ==> 122 MHz (tst_lo)} 620 -540 0 0 0.4 0.4 {}
 N 70 -530 70 -480 {lab=vdd}
 N 830 -740 870 -740 {lab=vdd}
-N 530 -620 530 -590 {lab=GND}
+N 530 -600 530 -570 {lab=GND}
 N 830 -690 940 -690 {lab=vcon}
 N 830 -710 1030 -710 {lab=vcop}
 N 490 -740 530 -740 {
@@ -35,6 +34,10 @@ N 180 -700 340 -700 {
 lab=#net1}
 N 180 -700 180 -670 {
 lab=#net1}
+N 460 -620 530 -620 {
+lab=en}
+N 400 -530 400 -480 {
+lab=en}
 C {vsource.sym} 70 -450 0 0 {name=V_VDD value=\{VDD\} savecurrent=false}
 C {gnd.sym} 70 -420 0 0 {name=l10 lab=GND}
 C {devices/code_shown.sym} -40 -180 0 0 {name=s1 only_toplevel=false value="* ejf_delaycell test
@@ -48,6 +51,7 @@ C {devices/code_shown.sym} -40 -180 0 0 {name=s1 only_toplevel=false value="* ej
 .param VTLO=0
 .param VTMID=0
 .param VTHI=0
+.param VEN=1.8
 .param RC=1
 "}
 C {devices/code_shown.sym} 800 -190 0 0 {name=s2 only_toplevel=false value="* Run transient
@@ -67,7 +71,7 @@ C {devices/code_shown.sym} 800 -190 0 0 {name=s2 only_toplevel=false value="* Ru
 .end"}
 C {lab_wire.sym} 70 -530 0 1 {name=p13 sig_type=std_logic lab=vdd}
 C {lab_wire.sym} 870 -740 0 1 {name=p3 sig_type=std_logic lab=vdd}
-C {gnd.sym} 530 -590 0 0 {name=l20 lab=GND}
+C {gnd.sym} 530 -570 0 0 {name=l20 lab=GND}
 C {parax_cap.sym} 1030 -700 0 0 {name=C1 gnd=0 value=\{CP\} m=1}
 C {parax_cap.sym} 940 -680 0 0 {name=C2 gnd=0 value=\{CP\} m=1}
 C {lab_wire.sym} 870 -710 0 1 {name=p14 sig_type=std_logic lab=vcop}
@@ -110,3 +114,10 @@ C {gnd.sym} 180 -610 0 0 {name=V1 lab=GND
 value=\{VS3\}}
 C {copyright.sym} 0 -270 0 0 {name=s3 place=header value="* Copyright (c) Eric Fogleman 2025 
 * SPDX-License-Identifier: Apache-2.0"}
+C {lab_wire.sym} 460 -620 0 1 {name=p6 sig_type=std_logic lab=en}
+C {vsource.sym} 400 -450 0 0 {name=V2 value=\{VEN\} savecurrent=false}
+C {gnd.sym} 400 -420 0 0 {name=V4 lab=GND
+value=\{VS3\}}
+C {lab_wire.sym} 400 -530 0 1 {name=p7 sig_type=std_logic lab=en}
+C {devices/code.sym} -40 220 0 0 {name=s4 only_toplevel=false value="tcleval(* lvdig standard cells (layout-extracted, C parasitics; symbols are primitives)
+.include $::LVDIG_SPICE/sky130_efx_lvdig_c.spice)"}

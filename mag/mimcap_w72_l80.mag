@@ -1,0 +1,28 @@
+magic
+tech sky130A
+magscale 1 2
+timestamp 1794678262
+<< metal3 >>
+rect -1332 0 1332 2952
+<< mimcap >>
+rect -1296 2879 1296 2916
+rect -1296 73 -1259 2879
+rect 1259 73 1296 2879
+rect -1296 36 1296 73
+<< mimcapcontact >>
+rect -1259 73 1259 2879
+<< metal4 >>
+rect -1260 2879 1260 2880
+rect -1260 73 -1259 2879
+rect 1259 73 1260 2879
+rect -1260 72 1260 73
+<< labels >>
+rlabel metal3 0 18 0 18 0 C2
+port 1 nsew
+rlabel mimcapcontact 0 2862 0 2862 0 C1
+port 2 nsew
+<< properties >>
+string gencell mimcap
+string library efx
+string parameters nw 72 nl 80
+<< end >>
