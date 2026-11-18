@@ -37,7 +37,7 @@ The reference, VCO and divider circuits use separate supply/ground pairs (`vdd_r
 | Supply Voltage | 1.62 | 1.8 | 1.98 | V |  |  |
 | Input frequency range | 4 |  | 16 | MHz |  |  |
 | Operating Temperature | -40 | 25 | 85 | °C |  |  |
-| Power Consumption |  | 378 |  | uW | From 1.8 V | 210 uA. Pre-layout sim (tt, 27 °C, C-extracted lvdig cells): 277-312 uW (154-174 uA) for 4-16 MHz input |
+| Power Consumption |  | 378 |  | uW | From 1.8 V | 210 uA. Current VCO (2026-11-18: 6-leg tail, delay-cell parasitic C back-annotated), tt, 27 °C: top-level sim at 16 MHz input 356 uW (198 uA: vdd_ref 32, vdd_vco 103, vdd_div 63); 4-16 MHz input estimated at about 320-356 uW (178-198 uA) from the previous regression plus 24 uA, not yet run. Previous VCO, full regression (C-extracted lvdig cells): 277-312 uW (154-174 uA) |
 | Lock time |  |  | 60 | T_ref | 15 us at 4 MHz, 3.75 us at 16 MHz (60 x R x T_ref if divr divides) |  |
 | Jitter (RMS) |  |  | 300 | ps | Meets USB 1.2 full-speed specification | Simulation and analysis |
 | Cycle-cycle jitter |  |  | 93 | ps | Meets USB 1.2 full-speed specification | Simulation and analysis |
@@ -55,7 +55,7 @@ The reference, VCO and divider circuits use separate supply/ground pairs (`vdd_r
 | --- | --- | --- |
 | vdd_ref | io | ref clock domain supply, 1.8 V+/-10%, 15-35 uA |
 | gnd_ref | io | ref clock domain gnd |
-| vdd_vco | io | vco domain supply, 1.8 V+/-10%, 100 uA |
+| vdd_vco | io | vco domain supply, 1.8 V+/-10%, 110 uA (2026-11-18 sim: 103 uA at 96 MHz, about 107 uA at 100 MHz from the VCO bench) |
 | gnd_vco | io | vco domain gnd |
 | vdd_div | io | divider domain supply, 1.8 V+/-10%, 75 uA |
 | gnd_div | io | divider domain gnd |

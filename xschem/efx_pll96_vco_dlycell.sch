@@ -4,6 +4,9 @@ K {}
 V {}
 S {}
 E {}
+T {Simulation-only parasitic C (pcapacitor.sym, lvs_ignore=open): layout-extracted from
+efx_pll96_vco_dlycell.mag (lvs/pex_c, saved 2026-11-18 06:56), C0..C20 rounded to 0.01 fF.
+Reproduces the extracted-C delay cell to about +2% in frequency (the rest is device junction C).} 60 90 0 0 0.3 0.3 {}
 N 370 -220 390 -220 {lab=gnd}
 N 310 -220 330 -220 {lab=outn}
 N 390 -220 390 -160 {lab=gnd}
@@ -96,7 +99,7 @@ N 1070 -220 1090 -220 {lab=gnd}
 N 1070 -220 1070 -160 {lab=gnd}
 N 1000 -160 1070 -160 {lab=gnd}
 N 980 -270 980 -250 {lab=outn}
-N 1130 -270 1130 -250 {lab=xxx}
+N 1130 -270 1130 -250 {lab=outp}
 C {sky130_fd_pr/nfet_01v8.sym} 350 -220 0 0 {name=MN2P
 W=1.26
 L=0.44
@@ -236,3 +239,66 @@ spiceprefix=X
 }
 C {lab_wire.sym} 980 -270 0 0 {name=p2 sig_type=std_logic lab=outn}
 C {lab_wire.sym} 1130 -270 0 0 {name=p3 sig_type=std_logic lab=outp}
+C {pcapacitor.sym} 80 200 0 0 {name=CP0 m=1 value=0.18f}
+C {lab_pin.sym} 80 170 0 0 {name=lcp0a sig_type=std_logic lab=inn}
+C {lab_pin.sym} 80 230 0 0 {name=lcp0b sig_type=std_logic lab=inp}
+C {pcapacitor.sym} 250 200 0 0 {name=CP1 m=1 value=0.26f}
+C {lab_pin.sym} 250 170 0 0 {name=lcp1a sig_type=std_logic lab=inp}
+C {lab_pin.sym} 250 230 0 0 {name=lcp1b sig_type=std_logic lab=vdd}
+C {pcapacitor.sym} 420 200 0 0 {name=CP2 m=1 value=1.63f}
+C {lab_pin.sym} 420 170 0 0 {name=lcp2a sig_type=std_logic lab=inp}
+C {lab_pin.sym} 420 230 0 0 {name=lcp2b sig_type=std_logic lab=outn}
+C {pcapacitor.sym} 590 200 0 0 {name=CP3 m=1 value=0.61f}
+C {lab_pin.sym} 590 170 0 0 {name=lcp3a sig_type=std_logic lab=vhi}
+C {lab_pin.sym} 590 230 0 0 {name=lcp3b sig_type=std_logic lab=inp}
+C {pcapacitor.sym} 760 200 0 0 {name=CP4 m=1 value=0.26f}
+C {lab_pin.sym} 760 170 0 0 {name=lcp4a sig_type=std_logic lab=inn}
+C {lab_pin.sym} 760 230 0 0 {name=lcp4b sig_type=std_logic lab=vdd}
+C {pcapacitor.sym} 930 200 0 0 {name=CP5 m=1 value=0.14f}
+C {lab_pin.sym} 930 170 0 0 {name=lcp5a sig_type=std_logic lab=inn}
+C {lab_pin.sym} 930 230 0 0 {name=lcp5b sig_type=std_logic lab=outn}
+C {pcapacitor.sym} 1100 200 0 0 {name=CP6 m=1 value=0.20f}
+C {lab_pin.sym} 1100 170 0 0 {name=lcp6a sig_type=std_logic lab=inp}
+C {lab_pin.sym} 1100 230 0 0 {name=lcp6b sig_type=std_logic lab=outp}
+C {pcapacitor.sym} 80 330 0 0 {name=CP7 m=1 value=0.62f}
+C {lab_pin.sym} 80 300 0 0 {name=lcp7a sig_type=std_logic lab=inn}
+C {lab_pin.sym} 80 360 0 0 {name=lcp7b sig_type=std_logic lab=vhi}
+C {pcapacitor.sym} 250 330 0 0 {name=CP8 m=1 value=1.71f}
+C {lab_pin.sym} 250 300 0 0 {name=lcp8a sig_type=std_logic lab=inn}
+C {lab_pin.sym} 250 360 0 0 {name=lcp8b sig_type=std_logic lab=outp}
+C {pcapacitor.sym} 420 330 0 0 {name=CP9 m=1 value=0.74f}
+C {lab_pin.sym} 420 300 0 0 {name=lcp9a sig_type=std_logic lab=vdd}
+C {lab_pin.sym} 420 360 0 0 {name=lcp9b sig_type=std_logic lab=outn}
+C {pcapacitor.sym} 590 330 0 0 {name=CP10 m=1 value=2.24f}
+C {lab_pin.sym} 590 300 0 0 {name=lcp10a sig_type=std_logic lab=vhi}
+C {lab_pin.sym} 590 360 0 0 {name=lcp10b sig_type=std_logic lab=vdd}
+C {pcapacitor.sym} 760 330 0 0 {name=CP11 m=1 value=1.46f}
+C {lab_pin.sym} 760 300 0 0 {name=lcp11a sig_type=std_logic lab=vhi}
+C {lab_pin.sym} 760 360 0 0 {name=lcp11b sig_type=std_logic lab=outn}
+C {pcapacitor.sym} 930 330 0 0 {name=CP12 m=1 value=0.33f}
+C {lab_pin.sym} 930 300 0 0 {name=lcp12a sig_type=std_logic lab=vdd}
+C {lab_pin.sym} 930 360 0 0 {name=lcp12b sig_type=std_logic lab=outp}
+C {pcapacitor.sym} 1100 330 0 0 {name=CP13 m=1 value=1.73f}
+C {lab_pin.sym} 1100 300 0 0 {name=lcp13a sig_type=std_logic lab=outp}
+C {lab_pin.sym} 1100 360 0 0 {name=lcp13b sig_type=std_logic lab=outn}
+C {pcapacitor.sym} 80 460 0 0 {name=CP14 m=1 value=1.51f}
+C {lab_pin.sym} 80 430 0 0 {name=lcp14a sig_type=std_logic lab=vhi}
+C {lab_pin.sym} 80 490 0 0 {name=lcp14b sig_type=std_logic lab=outp}
+C {pcapacitor.sym} 250 460 0 0 {name=CP15 m=1 value=1.38f}
+C {lab_pin.sym} 250 430 0 0 {name=lcp15a sig_type=std_logic lab=outp}
+C {lab_pin.sym} 250 490 0 0 {name=lcp15b sig_type=std_logic lab=gnd}
+C {pcapacitor.sym} 420 460 0 0 {name=CP16 m=1 value=1.40f}
+C {lab_pin.sym} 420 430 0 0 {name=lcp16a sig_type=std_logic lab=outn}
+C {lab_pin.sym} 420 490 0 0 {name=lcp16b sig_type=std_logic lab=gnd}
+C {pcapacitor.sym} 590 460 0 0 {name=CP17 m=1 value=1.41f}
+C {lab_pin.sym} 590 430 0 0 {name=lcp17a sig_type=std_logic lab=inn}
+C {lab_pin.sym} 590 490 0 0 {name=lcp17b sig_type=std_logic lab=gnd}
+C {pcapacitor.sym} 760 460 0 0 {name=CP18 m=1 value=1.43f}
+C {lab_pin.sym} 760 430 0 0 {name=lcp18a sig_type=std_logic lab=inp}
+C {lab_pin.sym} 760 490 0 0 {name=lcp18b sig_type=std_logic lab=gnd}
+C {pcapacitor.sym} 930 460 0 0 {name=CP19 m=1 value=1.58f}
+C {lab_pin.sym} 930 430 0 0 {name=lcp19a sig_type=std_logic lab=vhi}
+C {lab_pin.sym} 930 490 0 0 {name=lcp19b sig_type=std_logic lab=gnd}
+C {pcapacitor.sym} 1100 460 0 0 {name=CP20 m=1 value=7.34f}
+C {lab_pin.sym} 1100 430 0 0 {name=lcp20a sig_type=std_logic lab=vdd}
+C {lab_pin.sym} 1100 490 0 0 {name=lcp20b sig_type=std_logic lab=gnd}

@@ -82,11 +82,12 @@ sim/%.spice: xschem/%.sch $(SCH_FILES) $(CHECK_DEPS)
 	@grep -qE '^\.end$$' $@ || { echo "FAIL $@: xschem wrote no complete netlist"; rm -f $@; exit 1; }
 	$(check_netlist)
 
-# LVS schematic netlist: the cell as a .subckt
+# LVS schematic netlist: the cell as a .subckt. lvs_ignore=1 drops instances
+# marked lvs_ignore=open (e.g. pcapacitor.sym, simulation-only parasitic C).
 lvs/schematic/%.spice: xschem/%.sch $(SCH_FILES) $(CHECK_DEPS)
 	@rm -f $@ $@.bad
 	@echo "netlist  $@"
-	@cd xschem && $(call XSCHEM_RUN,--tcl 'set top_is_subckt 1' -o ../lvs/schematic $*.sch)
+	@cd xschem && $(call XSCHEM_RUN,--tcl 'set top_is_subckt 1; set lvs_ignore 1' -o ../lvs/schematic $*.sch)
 	@grep -qE '^\.subckt $*( |$$)' $@ || { echo "FAIL $@: xschem wrote no .subckt $*"; rm -f $@; exit 1; }
 	$(check_netlist)
 

@@ -163,9 +163,9 @@ C {devices/code_shown.sym} 860 120 0 0 {name=s2 only_toplevel=false value="* Run
    save xpll.vc2
    tran 1n 5u
    write tb_efx_pll96_top.raw
-   meas tran idd_ref avg i(v_vdd_ref) from=18u to=20u
-   meas tran idd_vco avg i(v_vdd_vco) from=18u to=20u
-   meas tran idd_div avg i(v_vdd_div) from=18u to=20u
+   meas tran idd_ref avg i(v_vdd_ref) from=4u to=5u
+   meas tran idd_vco avg i(v_vdd_vco) from=4u to=5u
+   meas tran idd_div avg i(v_vdd_div) from=4u to=5u
    meas tran T_CLK_OUT trig v(clk_out) val=0.9 rise=1 td=4.9u targ v(clk_out) val=0.9 rise=2 td=4.9u
    print 1/T_CLK_OUT
    plot xpll.vc xpll.vc2
