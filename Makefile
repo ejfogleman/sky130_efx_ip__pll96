@@ -4,6 +4,8 @@
 #   make sim                netlist every xschem/tb_*.sch into sim/ (ngspice)
 #   make sim/tb_foo.spice   one testbench
 #   make lvs CELL=foo       netlists of foo from xschem and Magic, then Netgen
+#                           (layout extracted cell by cell; LVS_FLAT=1 flattens it
+#                           first)
 #   make pex CELL=foo       LVS, then layout-extracted netlist lvs/pex_<PEX>/foo.spice
 #                           (PEX=c default: parasitic C; none: devices; rc: R and C),
 #                           ports in the schematic's order
@@ -29,7 +31,7 @@ SCH_FILES := $(wildcard xschem/*.sch xschem/*.sym dependencies/*/xschem/*.sch de
 MAG_FILES := $(wildcard mag/*.mag dependencies/*/mag/*.mag)
 TESTBENCHES := $(patsubst xschem/%.sch,sim/%.spice,$(wildcard xschem/tb_*.sch))
 
-.PHONY: sim lvs pex clean-lvs check clean help
+.PHONY: sim lvs pex clean-lvs check clean help FORCE
 
 # Keep the netlists: make would otherwise delete them as intermediate files
 # of the lvs/%.out chain once the report is written
@@ -98,11 +100,38 @@ check:
 	  t=$$(basename $$n .spice); scripts/sch_check.sh $$n xschem/$$t.sch || ok=0; done; \
 	 $(CHECK) $(wildcard sim/tb_*.spice) || ok=0; [ $$ok = 1 ]
 
-# LVS layout netlist: Magic in mag/ (reads ./.magicrc), .ext files to lvs/layout
-lvs/layout/%.spice: mag/%.mag $(MAG_FILES)
-	cd mag && printf '%s\n' 'load $*' 'extract path ../lvs/layout' 'extract all' \
+# LVS layout netlist: Magic in mag/ (reads ./.magicrc), .ext files to lvs/layout.
+# Hierarchical by default: Magic extracts each subcell on its own and Netgen
+# compares cell by cell. LVS_FLAT=1 flattens the cell into an unsaved <cell>_flat
+# first and renames the .subckt back to <cell>; Netgen then flattens the
+# schematic's subcells to match. Use it when a device's body is paint in a parent:
+# extracted on its own, such a subcell gets the wrong body (an efx ppolyres
+# without its nwell option, over a parent's n-well, comes out on the substrate,
+# VSUBS, instead of the well). lvs/layout/.lvs_flat records the mode of the last
+# run, so changing LVS_FLAT re-extracts.
+LVS_FLAT ?= 0
+ifeq ($(filter $(LVS_FLAT),0 1),)
+$(error LVS_FLAT must be 0 or 1, not '$(LVS_FLAT)')
+endif
+LVS_MODE := lvs/layout/.lvs_flat
+
+$(LVS_MODE): FORCE
+	@mkdir -p $(@D)
+	@echo $(LVS_FLAT) | cmp -s - $@ || echo $(LVS_FLAT) > $@
+
+ifeq ($(LVS_FLAT),1)
+LVS_LOAD = 'load $*' 'flatten $*_flat' 'load $*_flat' 'select top cell'
+LVS_RENAME = sed -i -e 's/^\.subckt $*_flat /.subckt $* /' -e 's/^\.ends $*_flat$$/.ends $*/' $@
+else
+LVS_LOAD = 'load $*'
+LVS_RENAME = true
+endif
+
+lvs/layout/%.spice: mag/%.mag $(MAG_FILES) $(LVS_MODE)
+	cd mag && printf '%s\n' $(LVS_LOAD) 'extract path ../lvs/layout' 'extract all' \
 	  'ext2spice lvs' 'ext2spice -p ../lvs/layout -o ../lvs/layout/$*.spice' \
 	  'quit -noprompt' | $(MAGIC)
+	$(LVS_RENAME)
 
 # Netgen report, remade when either netlist, a library below, or the script
 # changes. scripts/lvs.tcl reads every dependencies/*/cdl/*.cdl (e.g. lvdig's
@@ -174,7 +203,7 @@ pex: lvs
 endif
 
 clean-lvs:
-	rm -f lvs/*.out lvs/schematic/*.spice lvs/layout/*.spice lvs/layout/*.ext \
+	rm -f lvs/*.out lvs/schematic/*.spice lvs/layout/*.spice lvs/layout/*.ext lvs/layout/.lvs_flat \
 	  lvs/pex_*/*.spice lvs/pex_*/*.ext lvs/pex_*/*.sim lvs/pex_*/*.nodes
 
 clean: clean-lvs

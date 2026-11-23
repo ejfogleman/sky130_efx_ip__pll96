@@ -17,6 +17,8 @@ untitled*
 # Magic extresist working files (make pex PEX=rc)
 lvs/pex_*/*.sim
 lvs/pex_*/*.nodes
+# make lvs: the extraction mode of the last run (LVS_FLAT)
+lvs/layout/.lvs_flat
 
 # Exception: Allow png/pdf/eps in doc directory
 !doc/*.png

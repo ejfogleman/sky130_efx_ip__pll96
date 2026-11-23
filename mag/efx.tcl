@@ -80,12 +80,14 @@ proc efx::addtechmenu {framename} {
 # a message. efx gencells are instead named by their parameters, e.g.
 # nmos_n6_f2_l180_tl_tr_gb, which cannot collide.
 #
-# Tokens, in parameter order: n<n>, f<fingers>, l<length in nm> (MOS) or
-# w<nw>, l<nl> (resistors, MiM cap, in L); vt only if not std (lvt, hvt);
-# a flag only when set: bt (butted), tl / tr (left / right tap), gt / gb
-# (top / bottom gate bar). A parameter not listed here is spelt <key><value>.
+# Tokens, in parameter order: n<n>, f<fingers>, l<length in nm> (MOS);
+# w<nw>, l<nl> (MiM cap, in L); w<w in um>, rl<rl> (resistors: the extracted
+# length in L; cells before 2026-11-22 were l<nl>, the body in L); vt only if
+# not std (lvt, hvt); a flag only when set: bt (butted), tl / tr (left / right
+# tap), gt / gb (top / bottom gate bar), nwell (resistor n-well). A parameter
+# not listed here is spelt <key><value>.
 proc efx::cell_suffix {parameters} {
-    set flags {butted bt ltap tl rtap tr tgate gt bgate gb}
+    set flags {butted bt ltap tl rtap tr tgate gt bgate gb nwell nwell}
     set out {}
     dict for {key value} $parameters {
         if {[dict exists $flags $key]} {
@@ -94,9 +96,9 @@ proc efx::cell_suffix {parameters} {
             if {$value ne "std"} {lappend out $value}
         } elseif {$key eq "length" && [string is double -strict $value]} {
             lappend out l[expr {round($value * 1000)}]
-        } elseif {$key in {n fingers nw nl} && [string is double -strict $value]
+        } elseif {$key in {n fingers nw nl rl} && [string is double -strict $value]
                 && $value == round($value)} {
-            lappend out [dict get {n n fingers f nw w nl l} $key][expr {round($value)}]
+            lappend out [dict get {n n fingers f nw w nl l rl rl} $key][expr {round($value)}]
         } else {
             lappend out $key[regsub -all {[^A-Za-z0-9]} [string map {. p - m} $value] {}]
         }
@@ -565,11 +567,24 @@ proc efx::nmos_draw {parameters} {return [efx::mos_draw 1 $parameters]}
 proc efx::pmos_draw {parameters} {return [efx::mos_draw 0 $parameters]}
 
 # ---------------------------------------------------------------------------
-# p+ poly resistors: one vertical poly stripe w um wide with a body nl*L long, as
-# efx_primitives.ppolyres()/xpolyres(). Centred on x = 0, bottom at y = 0:
-# 12L head of xpc, body, 12L head. Ports R1 (bottom), R2 (top).
+# p+ poly resistors: one vertical poly stripe w um wide that extracts as l = rl*L,
+# as efx_primitives.ppolyres()/xpolyres(). Centred on x = 0, bottom at y = 0:
+# 12L head of xpc, body, 12L head. Ports R1 (bottom), R2 (top), and B on the
+# n-well when nwell is set.
 #   ppolyres  res_high_po, 319.8 ohm/sq:   body xhrpoly
 #   xpolyres  res_xhigh_po, 2000 ohm/sq:   body uhrpoly
+# Length (2026-11-22): sky130A.tech extracts l as the body plus 0.16 (the model's
+# l runs to the resistor licons, 0.08 into each head), and the PDK's generator
+# draws the body l - 0.16. So does this one: rl is the extracted (schematic)
+# length in L, and the body is rl*L - 0.16. The cell stays (rl + 24)*L tall with
+# the head li on the L grid: each head sits 0.08 in from its cell end, and its
+# li runs from the cell end to the head/body edge, so only the poly ends and the
+# head/body edges are off the L grid. Cells saved before then (parameter nl,
+# body nl*L, extracting nl*L + 0.16) keep their geometry and names (..._l<nl>);
+# re-opening one reads nl as rl, so it then extracts 0.16 shorter.
+# nwell puts an n-well under the resistor (L past the li, wider if needed for
+# nwell.1's 0.84) with the B port on it, so the body is that well and extracts
+# so even cell by cell; without it the body is whatever lies under the cell.
 # The width is in um, not L (2026-11-17): the foundry models come in fixed
 # widths, 0.35, 0.69, 1.41, 2.85 and 5.73, which are off the L grid. w >= 0.35,
 # on a 0.01 grid so the centred edges stay on the 0.005 manufacturing grid.
@@ -584,22 +599,42 @@ proc efx::pmos_draw {parameters} {return [efx::mos_draw 0 $parameters]}
 namespace eval efx {
     variable polyres_head 12	;# head height in L: the 2.0 cut + li.5 0.08 at each end
     variable polyres_wmin 0.35	;# um, the narrowest foundry model
+    variable polyres_ldelta 0.16	;# extracted l - drawn body (sky130A.tech l=l+0.16)
+    variable polyres_rlmin 3	;# rl >= 3: l >= 0.54, the PDK generator's lmin 0.50 on the L grid
+    variable polyres_nwpast 1	;# n-well past the head li, in L
+    variable polyres_nwmin 0.84	;# nwell.1 minimum width
     variable polyres {ppolyres {xhrpoly 319.8} xpolyres {uhrpoly 2000}}	;# body type, ohm/sq
 }
 
-# Cells saved before 2026-11-17 carry nw (width in L); read it as w = nw*L
+# Cells saved before 2026-11-17 carry nw (width in L); read it as w = nw*L.
+# Cells saved before 2026-11-22 carry nl (body length in L); read it as rl.
 proc efx::polyres_compat {parameters} {
     variable L
     if {[dict exists $parameters nw] && ![dict exists $parameters w]} {
         dict set parameters w [expr {round([dict get $parameters nw] * $L * 1000) / 1000.0}]
     }
-    return [dict remove $parameters nw]
+    if {[dict exists $parameters nl] && ![dict exists $parameters rl]} {
+        dict set parameters rl [dict get $parameters nl]
+    }
+    if {![dict exists $parameters nwell]} {dict set parameters nwell 0}
+    return [dict remove $parameters nw nl]
+}
+
+# n-well margin past the head li (nli L wide), in um: polyres_nwpast L, or
+# more in whole L so the well is at least nwell.1 wide
+proc efx::polyres_nwell_past {nli} {
+    variable L
+    variable polyres_nwpast
+    variable polyres_nwmin
+    set n [expr {max($polyres_nwpast, int(ceil(($polyres_nwmin - $nli * $L) / 2.0 / $L - 1e-6)))}]
+    return [expr {$n * $L}]
 }
 
 proc efx::polyres_draw {kind parameters} {
     variable L
     variable polyres
     variable polyres_head
+    variable polyres_ldelta
     set parameters [efx::polyres_compat $parameters]
     set body [lindex [dict get $polyres $kind] 0]
     dict with parameters {}
@@ -610,26 +645,34 @@ proc efx::polyres_draw {kind parameters} {
     set lx0 [expr {-$nli * $L / 2.0}]
     set lx1 [expr {$nli * $L / 2.0}]
     set hh [expr {$polyres_head * $L}]
-    set y1 [expr {$hh + $nl * $L}]
-    set h [expr {2 * $hh + $nl * $L}]
+    set h [expr {(2 * $polyres_head + $rl) * $L}]
+    set t [expr {$polyres_ldelta / 2.0}]	;# 0.08: poly end and head/body edge off the grid
+    set yb [expr {$t + $hh}]		;# body: rl*L - 0.16
+    set yt [expr {$h - $t - $hh}]
 
     pushbox
-    # The whole head is the resistor contact; li over it
-    foreach y [list 0 $y1] {
-        rect xpc $x0 $y $x1 [expr {$y + $hh}]
-        rect li $lx0 $y $lx1 [expr {$y + $hh}]
+    if {$nwell} {
+        set m [efx::polyres_nwell_past $nli]
+        rect nwell [expr {$lx0 - $m}] [expr {-$m}] [expr {$lx1 + $m}] [expr {$h + $m}]
     }
-    rect $body $x0 $hh $x1 $y1
-    # Ports on li, L/2 from the outer end of each head
+    # The whole head is the resistor contact; li from the cell end over it
+    rect xpc $x0 $t $x1 $yb
+    rect xpc $x0 $yt $x1 [expr {$h - $t}]
+    rect li $lx0 0 $lx1 $yb
+    rect li $lx0 $yt $lx1 $h
+    rect $body $x0 $yb $x1 $yt
+    # Ports on li, L/2 from the outer end of each head; B on the well
     pin R1 0 [expr {$L / 2.0}]
     pin R2 0 [expr {$h - $L / 2.0}]
+    if {$nwell} {pin B [expr {$lx1 + $m / 2.0}] [expr {$h / 2.0}] nwell}
     popbox
 }
 
-# w >= 0.35 on a 0.01 grid, whole nl >= 1; bad values are corrected with a
-# message, as mos_check
+# w >= 0.35 on a 0.01 grid, whole rl >= 3, nwell 0/1; bad values are corrected
+# with a message, as mos_check
 proc efx::polyres_check {kind parameters} {
     variable polyres_wmin
+    variable polyres_rlmin
     set parameters [efx::polyres_compat $parameters]
     set v [dict get $parameters w]
     if {![string is double -strict $v]} {
@@ -641,24 +684,25 @@ proc efx::polyres_check {kind parameters} {
         puts stderr "efx: w must be >= $polyres_wmin um, on a 0.01 grid; using w = $w"
     }
     dict set parameters w $w
-    set v [dict get $parameters nl]
-    if {![string is double -strict $v] || $v != round($v) || $v < 1} {
-        set v [expr {[string is double -strict $v] ? max(1, round($v)) : 1}]
-        puts stderr "efx: nl must be a whole number >= 1; using nl = $v"
+    set v [dict get $parameters rl]
+    if {![string is double -strict $v] || $v != round($v) || $v < $polyres_rlmin} {
+        set v [expr {[string is double -strict $v] ? max($polyres_rlmin, round($v)) : $polyres_rlmin}]
+        puts stderr "efx: rl must be a whole number >= $polyres_rlmin; using rl = $v"
     }
-    dict set parameters nl [expr {int($v)}]
+    dict set parameters rl [expr {int($v)}]
+    dict set parameters nwell [expr {[string is true -strict [dict get $parameters nwell]] ? 1 : 0}]
     return $parameters
 }
 
-# SPICE w and l (plain um, see mos_convert) to w and nl, rounded by _check.
-# Magic extracts l as the poly.res length, 0.16 past the body.
+# SPICE w and l (plain um, see mos_convert) to w and rl, rounded by _check.
+# l is the extracted length, rl*L.
 proc efx::polyres_convert {kind parameters} {
     variable L
     set out [dict create]
     dict for {key value} $parameters {
         switch -nocase $key {
             w {dict set out w [magic::3digitpastdecimal [magic::spice2float $value]]}
-            l {dict set out nl [magic::3digitpastdecimal [expr {([magic::spice2float $value] - 0.16) / $L}]]}
+            l {dict set out rl [magic::3digitpastdecimal [expr {[magic::spice2float $value] / $L}]]}
             default {dict set out $key $value}
         }
     }
@@ -669,14 +713,16 @@ proc efx::polyres_dialog {kind parameters} {
     variable L
     variable polyres
     variable polyres_wmin
+    variable polyres_rlmin
     set rho [lindex [dict get $polyres $kind] 1]
-    magic::add_message rule "R = $rho ohm/sq x nl x $L / w, plus the heads" $parameters
+    magic::add_message rule "R = $rho ohm/sq x rl x $L / w, plus the heads" $parameters
     magic::add_entry w "Width, um  (w >= $polyres_wmin; foundry 0.35 0.69 1.41 2.85 5.73)" $parameters
-    magic::add_entry nl "Length / L  (body = nl x $L um, nl >= 1)" $parameters
+    magic::add_entry rl "Length / L  (extracted l = rl x $L um, rl >= $polyres_rlmin)" $parameters
+    magic::add_checkbox nwell "N-well under the resistor (B port on it)" $parameters
 }
 
-proc efx::ppolyres_defaults {} {return {w 1.41 nl 10}}
-proc efx::xpolyres_defaults {} {return {w 1.41 nl 10}}
+proc efx::ppolyres_defaults {} {return {w 1.41 rl 10 nwell 0}}
+proc efx::xpolyres_defaults {} {return {w 1.41 rl 10 nwell 0}}
 foreach kind {ppolyres xpolyres} {
     foreach p {draw check convert dialog} {
         proc efx::${kind}_$p {parameters} "return \[efx::polyres_$p $kind \$parameters\]"

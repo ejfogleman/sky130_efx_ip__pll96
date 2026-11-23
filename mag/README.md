@@ -189,22 +189,26 @@ Starting in `mag/` is the simplest habit.
 | Device | `sky130_fd_pr__res_high_po` | `sky130_fd_pr__res_xhigh_po` |
 | Sheet resistance | 319.8 Ω/□ | 2000 Ω/□ |
 | Width | w in µm, w ≥ 0.35, on a 0.01 grid | the same |
-| Body length | nl·L, nl ≥ 1 | the same |
+| Length | rl·L as extracted, rl ≥ 3 (the body is drawn rl·L − 0.16) | the same |
+| nwell | n-well under the resistor, with a `B` pin on it | the same |
 
 **Geometry:**
-- One vertical poly stripe: a 12L contact head, the body, and another 12L head.
+- One vertical poly stripe: a 12L contact head, the body, and another 12L head. The cell is (rl + 24)·L tall.
+- The body is drawn 0.16 shorter than rl·L, as the PDK's own resistor generator does, and each head sits 0.08 in from its cell end. The li over each head runs from the cell end to the body, so it stays on the L grid; only the poly ends and the head/body edges are 0.08 off it.
 - Each head holds 0.19 × 2.0 resistor licons, side by side across the width.
 - The poly is exactly w wide. The li over each head is w rounded up to the next whole L, centred with the poly, so the li stays on the L/2 grid you route to.
 - Magic generates RPM/URPM, the implant and NPC.
 
 **Extraction:**
-- l = nl·L + 0.16, because poly.res runs to the cuts.
+- l = rl·L: the value to put in the schematic. Magic extracts the body plus 0.16 (the model's length runs to the cuts, 0.08 into each head), and the body is drawn 0.16 short to match.
+- Cells made before 2026-11-22 (named `…_l<nl>`, parameter `nl`) had a body of nl·L and extract as nl·L + 0.16. They keep that geometry until their parameters are changed; re-opening the dialog reads nl as rl, so the cell then extracts 0.16 shorter. New cells are named `…_rl<rl>`, with `_nwell` when the n-well is on.
 - The characterised widths 0.35, 0.69, 1.41, 2.85 and 5.73 extract as their own models (`sky130_fd_pr__res_high_po_0p35` …, `l` only). Use one of them where you can.
 - Any other width extracts as the generic model with `w` and `l`, interpolated between the characterised ones.
 
 **Pins:**
 - `R1` at the bottom, `R2` at the top.
-- There is no body pin; the body is the substrate or well.
+- With **nwell** off there is no body pin: the body is whatever lies under the cell. A gencell is extracted on its own, so over a parent's n-well its body still extracts as the substrate.
+- With **nwell** on, the cell has its own n-well (L past the li, wider if needed for nwell.1's 0.84) and a `B` pin on it, so the body extracts as that well. The parent supplies the n-tap: a lone cell gives Magic nwell.4.
 
 **A lone resistor narrower than 0.87 fails rpm.1a in KLayout** (the 0.35 and 0.69 foundry widths): RPM must be ≥ 1.27, and Magic draws it only 0.2 past the poly. Place them 2L apart (li to li), so their RPMs merge.
 

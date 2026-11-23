@@ -1,6 +1,8 @@
 # Chipalooza Rules & Regulations 
 [opencircuitdesign.com/chipalooza/rules-4.html](https://opencircuitdesign.com/chipalooza/rules-4.html)
 
+[List of IP blocks needed](https://docs.google.com/spreadsheets/d/132YkMiYaM0iHML5feT1yWLQIvP-pCM0lCArM9f1LxhM/edit?gid=0#gid=0)
+
 1. All designs created for this challenge must conform to all requirements of the Sky130 process (i.e., DRC, voltage limits, etc.). 
 
 2. The official start date for the Chipalooza Challenge #4 is Monday, November 9, 2026.

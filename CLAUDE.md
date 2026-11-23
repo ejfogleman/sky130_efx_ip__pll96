@@ -25,6 +25,7 @@ The repo follows `~/Projects/sky130_efx_ip__template` (identical `Makefile` and 
 make sim                              # netlist every xschem/tb_*.sch into sim/
 make sim/tb_efx_pll96_top_reg.spice   # one testbench
 make lvs CELL=efx_pll96_dbuf          # xschem + magic netlists, then netgen; fails on mismatch
+                                      # (hierarchical; LVS_FLAT=1 flattens the layout first)
                                       # (schematic side also reads dependencies/*/cdl/*.cdl, for lvdig cells)
                                       # (and is netlisted with lvs_ignore=1: xschem/pcapacitor.sym, a sim-only
                                       #  parasitic cap with lvs_ignore=open, is dropped from LVS, kept in sim/)

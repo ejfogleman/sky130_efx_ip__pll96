@@ -1,0 +1,24 @@
+magic
+tech sky130A
+magscale 1 2
+timestamp 1795050565
+<< xpolycontact >>
+rect -69 2304 69 2736
+rect -69 0 69 432
+<< ppolyres >>
+rect -69 432 69 2304
+<< locali >>
+rect -72 2304 -69 2736
+rect 69 2304 72 2736
+rect -72 0 -69 432
+rect 69 0 72 432
+<< labels >>
+rlabel xpolycontact 0 18 0 18 0 R1
+port 1 nsew
+rlabel xpolycontact 0 2718 0 2718 0 R2
+port 2 nsew
+<< properties >>
+string gencell ppolyres
+string library efx
+string parameters w 0.69 nl 52
+<< end >>
