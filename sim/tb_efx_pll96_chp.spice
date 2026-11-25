@@ -43,6 +43,10 @@ V9 b[1] GND {VB1}
 
 
 
+* lvdig standard cells (layout-extracted, C parasitics; symbols are primitives)
+.include /home/ejf/Projects/sky130_efx_ip__pll96/dependencies/sky130_efx_ip__lvdig/spice/sky130_efx_lvdig_c.spice
+
+
 *
 * default reltol=1e-3 vntol=1e-6 abstol=1e-12
 .options  reltol=1e-4 vntol=1e-7 abstol=1e-13

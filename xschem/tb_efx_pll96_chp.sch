@@ -55,6 +55,8 @@ C {devices/code_shown.sym} 0 120 0 0 {name=s1 only_toplevel=false value="* ejf_p
 .param VB0=1.8
 .param VEN=1.8
 "}
+C {devices/code.sym} 0 440 0 0 {name=s4 only_toplevel=false value="tcleval(* lvdig standard cells (layout-extracted, C parasitics; symbols are primitives)
+.include $::LVDIG_SPICE/sky130_efx_lvdig_c.spice)"}
 C {devices/code_shown.sym} 840 120 0 0 {name=s2 only_toplevel=false value="* 
 * default reltol=1e-3 vntol=1e-6 abstol=1e-12
 .options  reltol=1e-4 vntol=1e-7 abstol=1e-13
