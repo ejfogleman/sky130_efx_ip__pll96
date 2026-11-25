@@ -34,9 +34,9 @@ The reference, VCO and divider circuits use separate supply/ground pairs (`vdd_r
 | Parameter | Min | Typical | Max | Unit | Notes | Comments |
 | --- | --- | --- | --- | --- | --- | --- |
 | VCO Frequency Range | 86 | 96 | 106 | MHz |  |  |
-| Supply Voltage | 1.71 | 1.8 | 1.89 | V | ±5%, all three supply domains | Narrowed from ±10% (2026-11-25). 3-stage VCO, extracted, ss_hh: at 1.62 V and −40 °C the VCO tops out at 77 MHz, and at 1.71 V and −40 °C at 94.6 MHz (96 MHz not reachable); at 1.71 V and 0 °C, 96 MHz is at VC ≈ 0.51 V, 83 mV inside the 0.25·VDD lock-window limit. ff_ll 125 °C at 1.98 V: 96 MHz at VC 1.333 V, 152 mV inside the 0.75·VDD limit. 1.89 V not yet simulated |
+| Supply Voltage | 1.71 | 1.8 | 1.89 | V | ±5%, all three supply domains |  |
 | Input frequency range | 4 |  | 16 | MHz |  |  |
-| Operating Temperature | 0 | 25 | 125 | °C |  | Changed from −40 to 85 °C (2026-11-25). The slow-corner VCO top frequency drops about 6.5 MHz per 20 °C of cooling (ss_hh, 1.71 V: 107.5 / 100.9 / 94.6 MHz at 0 / −20 / −40 °C) |
+| Operating Temperature | 0 | 25 | 125 | °C |  |  |
 | Power Consumption |  | 378 |  | uW | From 1.8 V | 210 uA. Current VCO (2026-11-18: 6-leg tail, delay-cell parasitic C back-annotated), tt, 27 °C: top-level sim at 16 MHz input 356 uW (198 uA: vdd_ref 32, vdd_vco 103, vdd_div 63); 4-16 MHz input estimated at about 320-356 uW (178-198 uA) from the previous regression plus 24 uA, not yet run. Previous VCO, full regression (C-extracted lvdig cells): 277-312 uW (154-174 uA) |
 | Lock time |  |  | 60 | T_ref | 15 us at 4 MHz, 3.75 us at 16 MHz (60 x R x T_ref if divr divides) |  |
 | Jitter (RMS) |  |  | 300 | ps | Meets USB 1.2 full-speed specification | Simulation and analysis |

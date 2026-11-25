@@ -23,7 +23,7 @@ Background: `/home/ejf/Projects/sky130_efx_ip__pll96/CLAUDE.md`. Tools come from
 - The reason is the ss_hh low-supply, cold-temperature result in section 2.3: at ±10 % or −40 °C the VCO cannot reach 96 MHz.
 - `README.md` is updated (uncommitted):
   - Features line.
-  - Supply Voltage 1.71 / 1.8 / 1.89 V and Operating Temperature 0 / 25 / 125 °C, with the sim results in the Comments column.
+  - Supply Voltage 1.71 / 1.8 / 1.89 V (Notes: "±5%, all three supply domains") and Operating Temperature 0 / 25 / 125 °C. Spec comments are kept to what clarifies the spec, with no decision history (user, memory `spec-margin.md`).
   - The three supply pin rows now say ±5 %.
 
 ## 1. What landed this session (uncommitted)
@@ -129,7 +129,7 @@ ss_hh, 1.71 V, frequency in MHz vs VC (V):
 
 ## 3. What's still to do
 
-1. ~~Update README spec rows to the new corners~~ -- done 2026-11-25 (uncommitted). Add the 1.89 V / 0–125 °C sim results to the Comments once item 2 runs.
+1. ~~Update README spec rows to the new corners~~ -- done 2026-11-25 (uncommitted).
 2. **Re-run the corner set at the new limits.** About 30 min of compute.
    - Extracted VCO: ss_hh 0 °C at 1.71 V and ff_ll 125 °C at 1.89 V, at minimum. Add ss_hh 0 °C at 1.89 V and ff_ll 125 °C at 1.71 V for Kvco spread.
    - Charge pump at the resulting VCs, all three codes.
