@@ -4,8 +4,10 @@
     scripts/pex_ports.py RAW.spice REF.spice OUT.spice none|c|rc
 
 RAW is ext2spice's output for a flattened copy of the cell (.subckt name
-<cell>_flat), REF the cell's LVS schematic netlist from xschem
-(lvs/schematic/<cell>.spice). OUT gets:
+<cell>_flat, the only one), REF the cell's LVS schematic netlist from xschem
+(lvs/schematic/<cell>.spice; a hierarchical cell's also holds its subcells'
+.subckts, and the cell's own is the one named <cell>). Port lists may run onto
+'+' continuation lines. OUT gets:
   - the .subckt renamed back to <cell>
   - the ports in REF's order. Magic orders ports by the layout labels' port
     numbers, xschem by the symbol's pin order, and instance lines connect by
@@ -22,24 +24,31 @@ import re
 import sys
 
 
-def one_subckt(path, text):
-    found = re.findall(r'^\.subckt (\S+)(.*)$', text, re.M)
-    if len(found) != 1:
-        sys.exit(f'{path}: expected one .subckt, found {len(found)}')
-    return found[0][0], found[0][1].split()
+def unwrap(text):
+    """The netlist's lines with '+' continuation lines joined to the line before."""
+    return re.sub(r'\n\+', ' ', text).splitlines()
+
+
+def subckts(lines):
+    """{name: ports} for every .subckt line."""
+    return {f[1]: f[2:] for f in (ln.split() for ln in lines) if f and f[0] == '.subckt'}
 
 
 def main(raw, ref, out, mode):
-    rtext = open(raw).read()
-    name, have = one_subckt(raw, rtext)
+    rlines = unwrap(open(raw).read())
+    found = subckts(rlines)
+    if len(found) != 1:
+        sys.exit(f'{raw}: expected one .subckt (a flattened cell), found {len(found)}')
+    (name, have), = found.items()
     cell = re.sub(r'_flat$', '', name)
-    rname, want = one_subckt(ref, open(ref).read())
-    if rname != cell:
-        sys.exit(f'{raw}: cell {cell} but {ref} has {rname}')
+    refs = subckts(unwrap(open(ref).read()))
+    if cell not in refs:
+        sys.exit(f'{raw}: cell {cell}, but {ref} has no .subckt {cell} (has {", ".join(refs)})')
+    want = refs[cell]
     if sorted(have) != sorted(want):
         sys.exit(f'{raw}: ports {have} differ from {ref}: {want}')
     lines = []
-    for ln in rtext.splitlines():
+    for ln in rlines:
         if ln.startswith('* NGSPICE file created from'):
             continue
         if ln.startswith('.subckt '):

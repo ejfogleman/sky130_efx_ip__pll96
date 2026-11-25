@@ -146,7 +146,7 @@ C {devices/code_shown.sym} 860 120 0 0 {name=s2 only_toplevel=false value="* Run
    save clk clk_out clk_out_div2 ibnp_1u
    save xpll.qref xpll.qref_b xpll.qclk xpll.qclk_b xpll.vc xpll.vco_outp xpll.vco_outn
    save xpll.xvco.vhi xpll.clk_divf xpll.clk_ref
-   save xpll.xvco.x0p xpll.xvco.x0n xpll.xvco.x1p xpll.xvco.x1n xpll.xvco.x2p xpll.xvco.x2n xpll.xvco.x3p xpll.xvco.x3n
+   save xpll.xvco.x0p xpll.xvco.x0n xpll.xvco.x1p xpll.xvco.x1n xpll.xvco.x2p xpll.xvco.x2n 
    save xpll.xchp.vc_repl xpll.xchp.mp1g xpll.xchp.mn1g xpll.xchp.mn1cg
    save xpll.xchp.mn1d xpll.xchp.mp1d xpll.xchp.mp1cd xpll.xchp.mn1cd
    save xpll.vc2

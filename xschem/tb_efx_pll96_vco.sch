@@ -40,14 +40,14 @@ N 400 -530 400 -480 {
 lab=en}
 C {vsource.sym} 70 -450 0 0 {name=V_VDD value=\{VDD\} savecurrent=false}
 C {gnd.sym} 70 -420 0 0 {name=l10 lab=GND}
-C {devices/code_shown.sym} -40 -180 0 0 {name=s1 only_toplevel=false value="* ejf_delaycell test
-.lib ~/.ciel/sky130A/libs.tech/combined/sky130.lib.spice tt
-.option temp=27
+C {devices/code_shown.sym} -30 -180 0 0 {name=s1 only_toplevel=false value="* ejf_delaycell test
+.lib ~/.ciel/sky130A/libs.tech/combined/sky130.lib.spice ff_ll
+.option temp=125
 .param VDD=1.8
 .param I_PULSE=1u
 .param I_SRC=101u
 .param CP=20f
-.param VC=0.75
+.param VC=0.0
 .param VTLO=0
 .param VTMID=0
 .param VTHI=0
