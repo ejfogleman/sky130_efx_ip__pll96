@@ -1,0 +1,76 @@
+magic
+tech sky130A
+magscale 1 2
+timestamp 1795662493
+<< checkpaint >>
+rect -1404 -1296 4500 4896
+<< nwell >>
+rect -144 -36 3240 3636
+<< pmoslvt >>
+rect 36 0 1512 3600
+rect 1584 0 3060 3600
+<< pdiff >>
+rect -36 3564 36 3600
+rect -36 36 -17 3564
+rect 17 36 36 3564
+rect -36 0 36 36
+rect 1512 3564 1584 3600
+rect 1512 36 1531 3564
+rect 1565 36 1584 3564
+rect 1512 0 1584 36
+rect 3060 3564 3132 3600
+rect 3060 36 3079 3564
+rect 3113 36 3132 3564
+rect 3060 0 3132 36
+<< pdiffc >>
+rect -17 36 17 3564
+rect 1531 36 1565 3564
+rect 3079 36 3113 3564
+<< nsubdiff >>
+rect -108 3564 -36 3600
+rect -108 36 -89 3564
+rect -55 36 -36 3564
+rect -108 0 -36 36
+rect 3132 3564 3204 3600
+rect 3132 36 3151 3564
+rect 3185 36 3204 3564
+rect 3132 0 3204 36
+<< nsubdiffcont >>
+rect -89 36 -55 3564
+rect 3151 36 3185 3564
+<< poly >>
+rect 36 3600 1512 3636
+rect 1584 3600 3060 3636
+rect 36 -36 1512 0
+rect 1584 -36 3060 0
+<< locali >>
+rect -108 3564 36 3600
+rect -108 36 -89 3564
+rect -55 36 -17 3564
+rect 17 36 36 3564
+rect -108 0 36 36
+rect 1512 3564 1584 3600
+rect 1512 36 1531 3564
+rect 1565 36 1584 3564
+rect 1512 0 1584 36
+rect 3060 3564 3204 3600
+rect 3060 36 3079 3564
+rect 3113 36 3151 3564
+rect 3185 36 3204 3564
+rect 3060 0 3204 36
+<< labels >>
+rlabel locali 0 18 0 18 0 S0
+port 1 nsew
+rlabel locali 1548 18 1548 18 0 D0
+port 2 nsew
+rlabel locali 3096 18 3096 18 0 S1
+port 3 nsew
+rlabel locali -72 18 -72 18 0 B
+port 4 nsew
+rlabel locali 3168 18 3168 18 0 B
+port 4 nsew
+<< properties >>
+string gencell pmos
+string library efx
+string parameters n 100 fingers 2 length 7.38 butted 1 ltap 1 rtap 1 vt lvt tgate 0 bgate 0
+<< end >>

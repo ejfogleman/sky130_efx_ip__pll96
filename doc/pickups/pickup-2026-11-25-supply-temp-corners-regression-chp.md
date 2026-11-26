@@ -141,9 +141,13 @@ ss_hh, 1.71 V, frequency in MHz vs VC (V):
 4. **Loop stability at both Kvco extremes** for each mode's filter/charge-pump settings (`doc/pll-filter.ipynb`).
    - The 3-stage extracted Kvco ranges from about −80 MHz/V (ss_hh 0 °C, 1.71 V) to about −266 MHz/V (ff_ll 125 °C, high supply).
    - Redo it once item 2 gives the ±5 % numbers.
-5. **Locking regression at a corner** (for example ss_hh 0 °C / 1.71 V). `top_reg` takes about 6.4 h for 9 modes at tt; a single mode takes 0.5–1.3 h. Re-netlist first (memory `renetlist-before-sim.md`).
-6. **Commit** the chp bench fix and the pickups when the user asks.
-7. **Carried over:**
+5. **Check the loop-filter impedance across corners, including the `lpf_csc`/`lpf_rsc` transmission-gate switches.** The TG Ron must stay low enough that it does not distort the filter characteristic (zero, pole, crossover, phase margin) in any mode.
+   - Do an AC sweep of the filter impedance seen by the charge pump at VC over the 0.25–0.75 × VDD lock window, at tt, ss_hh 0 °C 1.71 V and ff_ll 125 °C 1.89 V, for each csc/rsc setting. Compare it with the ideal R/C values.
+   - Ron depends strongly on the channel voltage. A TG of 0.63/0.15 nfet_01v8_lvt in parallel with 1.08/0.15 pfet_01v8 (tt, 27 °C, 1.8 V) measures 5.9 kΩ at 0.9 V and peaks at 10.9 kΩ near 1.1 V. Ten of them in parallel measure 595 Ω and 1.1 kΩ (scratch decks `tg/tg3.spice`, `tg/tg5.spice`; use `m=`, since `mult=` is ignored on the sky130 FET subcircuits).
+   - The worst Ron is in the NMOS/PMOS handoff region (about 1.0–1.2 V at tt), and it is highest with slow devices at low VDD. Check the whole lock window at every corner, not just each corner's settled VC. The settled VCs (36 pF filter) are 0.56–0.59 V at ss_hh, 0.86–0.88 V at tt and 1.26–1.27 V at ff_ll; at ff_ll the settled VC lands near the handoff region.
+6. **Locking regression at a corner** (for example ss_hh 0 °C / 1.71 V). `top_reg` takes about 6.4 h for 9 modes at tt; a single mode takes 0.5–1.3 h. Re-netlist first (memory `renetlist-before-sim.md`).
+7. **Commit** the chp bench fix and the pickups when the user asks.
+8. **Carried over:**
    - In-phase `.ic` start test of the 3-stage ring.
    - Charge-pump bias reference realism (it is an ideal 1 µA source in the bench).
    - README proposal fixes from 2026-11-23 (unverified).

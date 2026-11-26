@@ -13,8 +13,8 @@
 .param VC4=0
 *
 .param VCPB0=0
-.param VCPB1=1.8
-.param VCPB2=0
+.param VCPB1=0
+.param VCPB2=1.8
 .param VCSC=0
 .param VRSC0=1.8
-.param VRSC1=1.8
+.param VRSC1=0

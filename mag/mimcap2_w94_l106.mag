@@ -1,0 +1,29 @@
+magic
+tech sky130A
+timestamp 1795662493
+<< checkpaint >>
+rect -1494 -630 1494 2574
+<< metal4 >>
+rect -864 0 864 1944
+<< mimcap2 >>
+rect -846 1896 846 1926
+rect -846 48 -816 1896
+rect 816 48 846 1896
+rect -846 18 846 48
+<< mimcap2contact >>
+rect -816 48 816 1896
+<< metal5 >>
+rect -828 1896 828 1908
+rect -828 48 -816 1896
+rect 816 48 828 1896
+rect -828 36 828 48
+<< labels >>
+rlabel metal4 0 9 0 9 0 C2
+port 1 nsew
+rlabel metal5 0 1899 0 1899 0 C1
+port 2 nsew
+<< properties >>
+string gencell mimcap2
+string library efx
+string parameters nw 94 nl 106
+<< end >>

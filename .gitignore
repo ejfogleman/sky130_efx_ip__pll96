@@ -25,11 +25,11 @@ lvs/layout/.lvs_flat
 !doc/*.pdf
 !doc/*.eps
 
-# Loop-filter working files (notebook, PDF and its markdown rendering), not published
-doc/pll-filter/
-
 # Chipalooza items sent separately from the proposal (equipment, CVs), not published
 doc/submission/
+
+# Retired layout cells kept locally for reference, not published
+mag/unused/
 
 # Simulation directory
 sim/*.txt
